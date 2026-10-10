@@ -1,0 +1,9 @@
+﻿Invoice No,Customer,Region,Total Amount,Paid Amount,Payment Status
+R-001,North Campus Store,North,1200.00,1200.00,Paid
+R-002,South Coffee Shop,South,850.00,0.00,Overdue
+R-003,East Library Cafe,East,1500.00,1500.00,Paid
+R-004,West Student Hub,West,2000.00,2000.00,Paid
+R-005,North Dorm Shop,North,600.00,600.00,Paid
+R-006,South Sports Club,South,950.00,0.00,Pending
+R-007,East Bookstore,East,1100.00,1100.00,Paid
+R-008,West Cafeteria,West,1750.00,1750.00,Paid

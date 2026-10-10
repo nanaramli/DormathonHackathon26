@@ -1,0 +1,113 @@
+========================================================================
+  RichBuddy - Business Analysis Report
+========================================================================
+
+Generated:        2026-10-10 17:21:52
+Instruction:      Analyse my overall business performance
+Intent:           overall_performance
+Confidence:       high
+Intent Method:    rule_based
+                  (Rule-based intent recognition -- no LLM was used.)
+
+------------------------------------------------------------------------
+  Dataset Summary
+------------------------------------------------------------------------
+  Invoices:         0
+  Transactions:     24
+  Income records:   12
+  Expense records:  12
+  Income categories:   Design, Printing
+  Expense categories:  Equipment, Food, Marketing, Software, Supplies, Transport, Utilities
+  Invoice statuses:    
+
+------------------------------------------------------------------------
+  Analysis Findings
+------------------------------------------------------------------------
+
+  Net Profit:
+    Total Revenue: 13905.0
+    Total Expenses: 2070.0
+    Net Profit: 11835.0
+    Profit Margin Pct: 85.1
+  Revenue By Category:
+    Total Revenue: 13905.0
+  Expense By Category:
+    Total Expense: 2070.0
+  Monthly Trends:
+
+  Category Summary:
+    - Category: Design
+    - Income Rm: 4030.0
+    - Expense Rm: 0.0
+    - Net Rm: 4030.0
+    - Transaction Count: 6
+    - Category: Equipment
+    - Income Rm: 0.0
+    - Expense Rm: 430.0
+    - Net Rm: -430.0
+    - Transaction Count: 2
+    - Category: Food
+    - Income Rm: 0.0
+    - Expense Rm: 95.0
+    - Net Rm: -95.0
+    - Transaction Count: 1
+    - Category: Marketing
+    - Income Rm: 0.0
+    - Expense Rm: 280.0
+    - Net Rm: -280.0
+    - Transaction Count: 2
+    - Category: Printing
+    - Income Rm: 9875.0
+    - Expense Rm: 0.0
+    - Net Rm: 9875.0
+    - Transaction Count: 6
+    - Category: Software
+    - Income Rm: 0.0
+    - Expense Rm: 210.0
+    - Net Rm: -210.0
+    - Transaction Count: 2
+    - Category: Supplies
+    - Income Rm: 0.0
+    - Expense Rm: 800.0
+    - Net Rm: -800.0
+    - Transaction Count: 2
+    - Category: Transport
+    - Income Rm: 0.0
+    - Expense Rm: 195.0
+    - Net Rm: -195.0
+    - Transaction Count: 2
+    - Category: Utilities
+    - Income Rm: 0.0
+    - Expense Rm: 60.0
+    - Net Rm: -60.0
+    - Transaction Count: 1
+  Expense Ratio:
+    Expense Ratio Pct: 14.9
+    Top Expense Category: Supplies
+    Top Expense Amount: 800.0
+
+------------------------------------------------------------------------
+  Prioritised Business Recommendations
+------------------------------------------------------------------------
+
+  Priority 2: Review and optimise Supplies costs
+    Finding:         Supplies is your largest expense at RM800.00, contributing to an overall expense ratio of 14.9% of revenue.
+    Recommendation:  Examine your supplies spending and look for cheaper suppliers, bulk-buy discounts, or items you can defer. Even a 10-15% reduction in this category would meaningfully improve your bottom line.
+    Why it matters:  Cutting your largest cost category has the biggest impact on profit. Small businesses often overpay for supplies or services because they don't shop around -- a quick review can yield immediate savings.
+    Data source:     expense_ratio_analysis
+
+------------------------------------------------------------------------
+  Data Notes & Limitations
+------------------------------------------------------------------------
+
+  - File detected as transaction-like (match score 6 vs 4 for invoices).
+  - Field 'region' mapped to column 'Campus Area' via substring match (alias 'area' in 'campusarea').
+  - Unmapped columns (not used in analysis): Customer.
+  - No 'type' column detected. Transaction type (income/expense) will be inferred from amount sign (positive = income, negative = expense).
+  - Only transaction data was detected. Invoice-level analysis (outstanding balances, collection rate) will be limited. For full analysis, provide an invoices file as well.
+  - Data was loaded from user-provided files using adaptive column mapping (Phase 2).
+  - No invoice data available -- invoice status and outstanding balance analysis are skipped.
+
+========================================================================
+  End of Report
+========================================================================

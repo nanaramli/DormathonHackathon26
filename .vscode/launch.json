@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "RichBuddy Web App",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/web_app.py",
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "RichBuddy CLI (interactive)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "args": ["--interactive"]
+        },
+        {
+            "name": "RichBuddy CLI (sample data)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "console": "integratedTerminal",
+            "args": ["--data", "${workspaceFolder}/sample_data", "Analyse my overall business performance"]
+        },
+        {
+            "name": "Run All Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/run_tests.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}

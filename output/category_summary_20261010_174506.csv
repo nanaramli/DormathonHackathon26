@@ -1,0 +1,8 @@
+category,income_rm,expense_rm,net_rm,transaction_count
+Design,4100.0,0.0,4100.0,3
+Marketing,0.0,200.0,-200.0,1
+Printing,6900.0,0.0,6900.0,3
+Software,0.0,150.0,-150.0,1
+Supplies,0.0,1550.0,-1550.0,2
+Transport,0.0,120.0,-120.0,1
+Utilities,0.0,180.0,-180.0,1

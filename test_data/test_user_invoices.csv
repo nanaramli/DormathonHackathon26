@@ -1,0 +1,5 @@
+﻿Invoice No,Customer,Date Issued,Payment Due,Total Amount,Paid Amount,Balance,Payment Status
+INV001,Acme Corp,2026-09-02,2026-09-09,1500.00,1500.00,0.00,Paid
+INV002,Beta LLC,2026-09-05,2026-09-12,2200.00,2200.00,0.00,Paid
+INV003,Gamma Inc,2026-09-10,2026-09-17,800.00,0.00,800.00,Overdue
+INV004,Delta Co,2026-09-15,2026-09-22,3000.00,3000.00,0.00,Paid

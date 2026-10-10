@@ -1,0 +1,79 @@
+========================================================================
+  RichBuddy - Business Analysis Report
+========================================================================
+
+Generated:        2026-10-10 17:45:18
+Instruction:      Compare my sales and profitability across regions
+Intent:           regional_comparison
+Confidence:       high
+Intent Method:    rule_based
+                  (Rule-based intent recognition -- no LLM was used.)
+
+------------------------------------------------------------------------
+  Dataset Summary
+------------------------------------------------------------------------
+  Invoices:         9
+  Transactions:     12
+  Income records:   6
+  Expense records:  6
+  Income categories:   Design, Printing
+  Expense categories:  Marketing, Software, Supplies, Transport, Utilities
+  Invoice statuses:    overdue, paid, pending
+
+------------------------------------------------------------------------
+  Analysis Findings
+------------------------------------------------------------------------
+
+  Customer Breakdown:
+
+  Revenue By Category:
+    Total Revenue: 11000.0
+  Expense By Category:
+    Total Expense: 2200.0
+  Category Summary:
+    - Category: Design
+    - Income Rm: 4100.0
+    - Expense Rm: 0.0
+    - Net Rm: 4100.0
+    - Transaction Count: 3
+    - Category: Marketing
+    - Income Rm: 0.0
+    - Expense Rm: 200.0
+    - Net Rm: -200.0
+    - Transaction Count: 1
+    - Category: Printing
+    - Income Rm: 6900.0
+    - Expense Rm: 0.0
+    - Net Rm: 6900.0
+    - Transaction Count: 3
+    - Category: Software
+    - Income Rm: 0.0
+    - Expense Rm: 150.0
+    - Net Rm: -150.0
+    - Transaction Count: 1
+    - Category: Supplies
+    - Income Rm: 0.0
+    - Expense Rm: 1550.0
+    - Net Rm: -1550.0
+    - Transaction Count: 2
+    - Category: Transport
+    - Income Rm: 0.0
+    - Expense Rm: 120.0
+    - Net Rm: -120.0
+    - Transaction Count: 1
+    - Category: Utilities
+    - Income Rm: 0.0
+    - Expense Rm: 180.0
+    - Net Rm: -180.0
+    - Transaction Count: 1
+
+------------------------------------------------------------------------
+  Data Notes & Limitations
+------------------------------------------------------------------------
+
+  - The dataset does not contain a 'region' or 'location' column, so regional sales comparison is not possible with this data.
+  - Available breakdown dimensions: customer name, transaction category, date, and invoice status.
+
+========================================================================
+  End of Report
+========================================================================

@@ -1,0 +1,106 @@
+========================================================================
+  RichBuddy - Business Analysis Report
+========================================================================
+
+Generated:        2026-10-10 17:43:35
+Instruction:      Analyse my overall business performance
+Intent:           overall_performance
+Confidence:       high
+Intent Method:    rule_based
+                  (Rule-based intent recognition -- no LLM was used.)
+
+------------------------------------------------------------------------
+  Dataset Summary
+------------------------------------------------------------------------
+  Invoices:         9
+  Transactions:     12
+  Income records:   6
+  Expense records:  6
+  Income categories:   Design, Printing
+  Expense categories:  Marketing, Software, Supplies, Transport, Utilities
+  Invoice statuses:    overdue, paid, pending
+
+------------------------------------------------------------------------
+  Analysis Findings
+------------------------------------------------------------------------
+
+  Net Profit:
+    Total Revenue: 11000.0
+    Total Expenses: 2200.0
+    Net Profit: 8800.0
+    Profit Margin Pct: 80.0
+  Revenue By Category:
+    Total Revenue: 11000.0
+  Expense By Category:
+    Total Expense: 2200.0
+  Monthly Trends:
+
+  Category Summary:
+    - Category: Design
+    - Income Rm: 4100.0
+    - Expense Rm: 0.0
+    - Net Rm: 4100.0
+    - Transaction Count: 3
+    - Category: Marketing
+    - Income Rm: 0.0
+    - Expense Rm: 200.0
+    - Net Rm: -200.0
+    - Transaction Count: 1
+    - Category: Printing
+    - Income Rm: 6900.0
+    - Expense Rm: 0.0
+    - Net Rm: 6900.0
+    - Transaction Count: 3
+    - Category: Software
+    - Income Rm: 0.0
+    - Expense Rm: 150.0
+    - Net Rm: -150.0
+    - Transaction Count: 1
+    - Category: Supplies
+    - Income Rm: 0.0
+    - Expense Rm: 1550.0
+    - Net Rm: -1550.0
+    - Transaction Count: 2
+    - Category: Transport
+    - Income Rm: 0.0
+    - Expense Rm: 120.0
+    - Net Rm: -120.0
+    - Transaction Count: 1
+    - Category: Utilities
+    - Income Rm: 0.0
+    - Expense Rm: 180.0
+    - Net Rm: -180.0
+    - Transaction Count: 1
+  Expense Ratio:
+    Expense Ratio Pct: 20.0
+    Top Expense Category: Supplies
+    Top Expense Amount: 1550.0
+  Invoice Status:
+    Total Invoiced: 14000.0
+    Total Paid: 11000.0
+    Total Outstanding: 3000.0
+  Outstanding:
+    Total Outstanding: 3000.0
+    Overdue Amount: 2200.0
+    Pending Amount: 800.0
+    Collection Rate Pct: 78.6
+
+------------------------------------------------------------------------
+  Prioritised Business Recommendations
+------------------------------------------------------------------------
+
+  Priority 1: Chase overdue invoices immediately
+    Finding:         RM2200.00 is overdue across 2 invoice(s): INV007 (Customer D, RM1200.00), INV008 (Student Club, RM1000.00). The collection rate is 78.6%.
+    Recommendation:  Contact the customers listed above and request immediate payment. Consider setting up payment reminders or follow-up procedures for future invoices.
+    Why it matters:  Overdue invoices mean money you have already earned is not in your bank account. For a small business, even a few weeks of delayed payment can create cash-flow problems that affect your ability to buy materials or pay for services.
+    Data source:     outstanding_balance_analysis
+
+  Priority 2: Review and optimise Supplies costs
+    Finding:         Supplies is your largest expense at RM1550.00, contributing to an overall expense ratio of 20.0% of revenue.
+    Recommendation:  Examine your supplies spending and look for cheaper suppliers, bulk-buy discounts, or items you can defer. Even a 10-15% reduction in this category would meaningfully improve your bottom line.
+    Why it matters:  Cutting your largest cost category has the biggest impact on profit. Small businesses often overpay for supplies or services because they don't shop around -- a quick review can yield immediate savings.
+    Data source:     expense_ratio_analysis
+
+========================================================================
+  End of Report
+========================================================================

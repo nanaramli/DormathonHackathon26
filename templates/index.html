@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RichBuddy — Business Intelligence Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+    <!-- ===== Sidebar ===== -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <div class="brand-mark">RB</div>
+                <div class="brand-text">
+                    <span class="brand-name">RichBuddy</span>
+                    <span class="brand-sub">Business Co-Pilot</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <a class="nav-item active" data-panel="data">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Data Source</span>
+                <span class="nav-step">1</span>
+            </a>
+            <a class="nav-item disabled" data-panel="analysis">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                <span>Analysis</span>
+                <span class="nav-step">2</span>
+            </a>
+            <a class="nav-item disabled" data-panel="results">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Results</span>
+                <span class="nav-step">3</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="status-pill" id="statusPill">
+                <span class="status-dot"></span>
+                <span id="statusText">No data loaded</span>
+            </div>
+            <p class="sidebar-copy">Rule-based engine<br>No LLM required</p>
+        </div>
+    </nav>
+
+    <!-- ===== Mobile Overlay ===== -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ===== Main Content ===== -->
+    <div class="main-wrap">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="topbar-title" id="topbarTitle">Data Source</div>
+            <div class="topbar-right">
+                <button class="ghost-btn" id="resetBtn" style="display:none;" title="Start over">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Scroll progress -->
+        <div class="scroll-progress" id="scrollProgress"></div>
+
+        <!-- ===== Panels Container ===== -->
+        <div class="panels">
+
+            <!-- ===== Panel 1: Data Source ===== -->
+            <section class="panel active" id="panel-data">
+                <div class="panel-inner">
+                    <div class="panel-hero">
+                        <h2 class="hero-title">Connect Your Data</h2>
+                        <p class="hero-desc">Drop in your invoice and transaction files — we'll handle the rest. CSV, Excel, whatever you've got.</p>
+                    </div>
+
+                    <div class="data-grid">
+                        <!-- Upload card -->
+                        <div class="upload-card" id="uploadZone">
+                            <div class="upload-inner">
+                                <div class="upload-graphic">
+                                    <svg viewBox="0 0 80 80" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path d="M40 56V24" stroke-linecap="round"/>
+                                        <path d="M28 36l12-12 12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M20 52v8a4 4 0 0 0 4 4h32a4 4 0 0 0 4-4v-8" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="upload-body">
+                                    <p class="upload-title">Drag files here or <span class="upload-link">browse</span></p>
+                                    <p class="upload-hint">CSV, XLSX — up to 16 MB</p>
+                                </div>
+                            </div>
+                            <input type="file" id="fileInput" multiple accept=".csv,.xlsx,.xls" hidden>
+                        </div>
+
+                        <!-- Sample data card -->
+                        <button class="sample-card" id="sampleDataBtn">
+                            <div class="sample-graphic">
+                                <svg viewBox="0 0 48 48" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="6" y="8" width="36" height="32" rx="3"/>
+                                    <path d="M14 20h20M14 28h12" stroke-linecap="round"/>
+                                    <circle cx="34" cy="28" r="2" fill="currentColor" stroke="none"/>
+                                </svg>
+                            </div>
+                            <div class="sample-body">
+                                <p class="sample-title">Use Sample Data</p>
+                                <p class="sample-hint">9 invoices, 12 transactions — try it instantly</p>
+                            </div>
+                            <svg class="sample-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- File list -->
+                    <div class="file-list" id="loadedFilesInfo" style="display:none;"></div>
+                    <!-- Data summary -->
+                    <div class="data-summary-box" id="dataSummaryBox" style="display:none;"></div>
+                </div>
+            </section>
+
+            <!-- ===== Panel 2: Analysis ===== -->
+            <section class="panel" id="panel-analysis">
+                <div class="panel-inner">
+                    <div class="panel-hero">
+                        <h2 class="hero-title">What do you want to know?</h2>
+                        <p class="hero-desc">Pick a quick analysis below, or type your own question in plain English.</p>
+                    </div>
+
+                    <div class="quick-grid" id="quickButtons"></div>
+
+                    <div class="custom-query">
+                        <div class="query-label">Custom question</div>
+                        <div class="query-row">
+                            <div class="query-input-wrap">
+                                <svg class="query-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                <input type="text" id="instructionInput" class="query-input"
+                                       placeholder="e.g. Analyse my overall business performance">
+                            </div>
+                            <button class="btn btn-primary" id="analyzeBtn">
+                                <span>Analyze</span>
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="loading-overlay" id="loadingBar" style="display:none;">
+                        <div class="loading-content">
+                            <div class="loading-ring"></div>
+                            <div class="loading-text">
+                                <span class="loading-title">Crunching numbers...</span>
+                                <span class="loading-sub" id="loadingSub">Running analysis pipeline</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== Panel 3: Results ===== -->
+            <section class="panel" id="panel-results">
+                <div class="panel-inner">
+
+                    <!-- Intent header -->
+                    <div class="result-header" id="intentBanner"></div>
+
+                    <!-- KPI row -->
+                    <div class="kpi-grid" id="kpiGrid"></div>
+
+                    <!-- Tab navigation -->
+                    <div class="tabs-bar" id="tabsBar" style="display:none;">
+                        <button class="tab active" data-tab="charts">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>
+                            <span>Charts</span>
+                        </button>
+                        <button class="tab" data-tab="tables">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+                            <span>Tables</span>
+                        </button>
+                        <button class="tab" data-tab="recommendations">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                            <span>Actions</span>
+                            <span class="tab-badge" id="tabBadgeRecs" style="display:none;"></span>
+                        </button>
+                        <button class="tab" data-tab="notes">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                            <span>Notes</span>
+                        </button>
+                        <button class="tab" data-tab="files">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            <span>Files</span>
+                        </button>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div class="tab-content active" id="tab-charts">
+                        <div class="charts-grid" id="chartsGrid"></div>
+                    </div>
+                    <div class="tab-content" id="tab-tables">
+                        <div class="tables-section" id="tablesSection"></div>
+                    </div>
+                    <div class="tab-content" id="tab-recommendations">
+                        <div class="recommendations-list" id="recommendationsList"></div>
+                    </div>
+                    <div class="tab-content" id="tab-notes">
+                        <ul class="data-notes-list" id="dataNotesList"></ul>
+                    </div>
+                    <div class="tab-content" id="tab-files">
+                        <div class="output-files-list" id="outputFilesList"></div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!-- ===== Toast ===== -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <footer class="app-footer">
+            <p>RichBuddy &mdash; All analysis computed from your actual data. Rule-based intent recognition.</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

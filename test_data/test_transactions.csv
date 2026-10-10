@@ -1,0 +1,13 @@
+﻿Tx ID,Date,Entry Type,Category,Description,Amount,Linked Invoice
+TX-001,2026-09-02,Income,Design,Logo design for Acme,1500.00,INV-001
+TX-002,2026-09-03,Expense,Supplies,Printing paper and ink,450.00,
+TX-003,2026-09-05,Income,Printing,University club banners,2200.00,INV-002
+TX-004,2026-09-07,Expense,Marketing,Social media ads,200.00,
+TX-005,2026-09-10,Income,Design,Business card design,800.00,INV-003
+TX-006,2026-09-12,Expense,Transport,Delivery and fuel,120.00,
+TX-007,2026-09-15,Income,Printing,Campus merchandise,3000.00,INV-004
+TX-008,2026-09-18,Expense,Supplies,T-shirts and materials,1100.00,
+TX-009,2026-09-21,Income,Design,Social media package,1800.00,INV-005
+TX-010,2026-09-24,Expense,Utilities,Internet and electricity,180.00,
+TX-011,2026-09-26,Income,Printing,Flyers and brochures,1700.00,INV-006
+TX-012,2026-09-28,Expense,Software,Design software subscription,150.00,

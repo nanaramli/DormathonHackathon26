@@ -1,0 +1,5 @@
+﻿Invoice No,Customer,Region,Total Amount,Paid Amount,Payment Status
+INV001,North Corp,North,1500.00,1500.00,Paid
+INV002,South LLC,South,2200.00,0.00,Overdue
+INV003,East Inc,East,800.00,800.00,Paid
+INV004,West Co,West,3000.00,3000.00,Paid

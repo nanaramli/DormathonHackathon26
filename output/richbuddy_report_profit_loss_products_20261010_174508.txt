@@ -1,0 +1,115 @@
+========================================================================
+  RichBuddy - Business Analysis Report
+========================================================================
+
+Generated:        2026-10-10 17:45:08
+Instruction:      Which products are making the most profit, and which are losing money?
+Intent:           profit_loss_products
+Confidence:       high
+Intent Method:    rule_based
+                  (Rule-based intent recognition -- no LLM was used.)
+
+------------------------------------------------------------------------
+  Dataset Summary
+------------------------------------------------------------------------
+  Invoices:         9
+  Transactions:     12
+  Income records:   6
+  Expense records:  6
+  Income categories:   Design, Printing
+  Expense categories:  Marketing, Software, Supplies, Transport, Utilities
+  Invoice statuses:    overdue, paid, pending
+
+------------------------------------------------------------------------
+  Analysis Findings
+------------------------------------------------------------------------
+
+  Profit By Category:
+    Allocation Method: Direct expenses (Supplies->Printing, Software->Design, Transport->Printing) are assigned to their mapped income category. Shared overhead (Marketing, Utilities) is allocated by each category's revenue share. This is an estimate because the dataset does not contain explicit cost-of-goods-sold per product.
+    Total Revenue: 11000.0
+    Total Cost: 2200.0
+    Total Profit: 8800.0
+  Revenue By Category:
+    Total Revenue: 11000.0
+  Expense By Category:
+    Total Expense: 2200.0
+  Category Summary:
+    - Category: Design
+    - Income Rm: 4100.0
+    - Expense Rm: 0.0
+    - Net Rm: 4100.0
+    - Transaction Count: 3
+    - Category: Marketing
+    - Income Rm: 0.0
+    - Expense Rm: 200.0
+    - Net Rm: -200.0
+    - Transaction Count: 1
+    - Category: Printing
+    - Income Rm: 6900.0
+    - Expense Rm: 0.0
+    - Net Rm: 6900.0
+    - Transaction Count: 3
+    - Category: Software
+    - Income Rm: 0.0
+    - Expense Rm: 150.0
+    - Net Rm: -150.0
+    - Transaction Count: 1
+    - Category: Supplies
+    - Income Rm: 0.0
+    - Expense Rm: 1550.0
+    - Net Rm: -1550.0
+    - Transaction Count: 2
+    - Category: Transport
+    - Income Rm: 0.0
+    - Expense Rm: 120.0
+    - Net Rm: -120.0
+    - Transaction Count: 1
+    - Category: Utilities
+    - Income Rm: 0.0
+    - Expense Rm: 180.0
+    - Net Rm: -180.0
+    - Transaction Count: 1
+  Loss Making:
+  Profitable:
+    - Category: Printing
+    - Revenue: 6900.0
+    - Direct Cost: 1670.0
+    - Overhead Cost: 238.36
+    - Total Cost: 1908.36
+    - Profit: 4991.64
+    - Profit Margin Pct: 72.3
+    - Is Loss Making: False
+    - Category: Design
+    - Revenue: 4100.0
+    - Direct Cost: 150.0
+    - Overhead Cost: 141.64
+    - Total Cost: 291.64
+    - Profit: 3808.36
+    - Profit Margin Pct: 92.9
+    - Is Loss Making: False
+  Net Profit:
+    Total Revenue: 11000.0
+    Total Expenses: 2200.0
+    Net Profit: 8800.0
+    Profit Margin Pct: 80.0
+
+------------------------------------------------------------------------
+  Prioritised Business Recommendations
+------------------------------------------------------------------------
+
+  Priority 3: Expand your most profitable service: Printing
+    Finding:         Printing generates RM6900.00 in revenue with an estimated profit margin of 72.3% (profit: RM4991.64).
+    Recommendation:  Invest more marketing effort into printing services. Look for ways to scale this offering -- new customers, higher pricing, or complementary add-ons.
+    Why it matters:  Your most profitable category is where you get the best return for your effort. Doubling down on it is usually more effective than trying to fix a weaker category.
+    Data source:     profit_by_category_analysis
+
+------------------------------------------------------------------------
+  Data Notes & Limitations
+------------------------------------------------------------------------
+
+  - Direct expenses (Supplies->Printing, Software->Design, Transport->Printing) are assigned to their mapped income category. Shared overhead (Marketing, Utilities) is allocated by each category's revenue share. This is an estimate because the dataset does not contain explicit cost-of-goods-sold per product.
+  - The dataset does not contain a 'product' column. Income categories (e.g., Design, Printing) are used as the closest proxy for 'products' or 'services'.
+
+========================================================================
+  End of Report
+========================================================================
