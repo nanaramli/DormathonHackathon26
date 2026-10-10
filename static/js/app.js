@@ -469,7 +469,7 @@ function renderKPIs(findings) {
     if (findings.outstanding) {
         const out = findings.outstanding;
         cards.push(kpiCard("Outstanding", out.total_outstanding,
-            out.overdue_amount > 0 ? formatRM(out.overdue_amount) + " overdue" : "No overdue",
+            out.overdue_amount > 0 ? fmtRM(out.overdue_amount) + " overdue" : "No overdue",
             out.total_outstanding > 0 ? "kpi-negative" : "kpi-positive"));
         cards.push(kpiCard("Collection Rate", out.collection_rate_pct + "%",
             "Paid vs invoiced", out.collection_rate_pct >= 80 ? "kpi-positive" : "kpi-negative", true));
@@ -514,7 +514,7 @@ function kpiCard(label, value, sub, valueClass, isNumeric) {
     }
     return `<div class="kpi-card">
         <div class="kpi-label">${label}</div>
-        <div class="kpi-value ${valueClass}">${formatRM(value)}</div>
+        <div class="kpi-value ${valueClass}">${fmtRM(value)}</div>
         <div class="kpi-sub">${sub}</div>
     </div>`;
 }
