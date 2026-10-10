@@ -10,9 +10,7 @@ web dashboard.  Users can:
   - Download generated reports and CSV files
 """
 
-import io
 import os
-import json
 import tempfile
 import shutil
 from datetime import datetime
@@ -198,8 +196,10 @@ def api_analyze():
     # ------------------------------------------------------------------
     try:
         result = run_analysis(instruction, dataset, OUTPUT_DIR)
+    except (DataLoadError, AdaptiveLoadError) as e:
+        return jsonify({"error": f"Analysis failed: {e}"}), 400
     except Exception as e:
-        return jsonify({"error": f"Analysis failed: {e}"}), 500
+        return jsonify({"error": f"Internal error: {e}"}), 500
 
     # Serialize the result for JSON
     response = _serialize_result(result)
@@ -269,4 +269,4 @@ if __name__ == "__main__":
     print("  RichBuddy Web Application")
     print("  Starting server on http://127.0.0.1:5000")
     print("=" * 60)
-    app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=False)
+    app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)

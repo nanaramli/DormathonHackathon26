@@ -18,7 +18,7 @@ import os
 from datetime import datetime
 from typing import Any
 
-from file_inspector import inspect_file, FileInspectionError, format_inspection_summary
+from file_inspector import inspect_file, FileInspectionError
 from column_mapper import (
     map_invoice_columns,
     map_transaction_columns,
