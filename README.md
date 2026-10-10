@@ -1,2 +1,8 @@
 # DormathonHackathon26
 Dormathon Hackathon 10-11 Oct 2026
+
+By:
+HARIANI PRAHANA
+NURFARA HANAH
+AINA NUR WAFIY
+FARHAH NATASHA
