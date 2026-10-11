@@ -1,0 +1,8 @@
+﻿Invoice No,Client Name,Date Issued,Due Date,Total Amount,Amount Paid,Balance,Payment Status
+INV-001,Acme Corporation,2026-09-02,2026-09-09,1500.00,1500.00,0.00,Paid
+INV-002,Beta University Club,2026-09-05,2026-09-12,2200.00,2200.00,0.00,Paid
+INV-003,Gamma Student Society,2026-09-10,2026-09-17,800.00,0.00,800.00,Overdue
+INV-004,Delta Campus Office,2026-09-15,2026-09-22,3000.00,3000.00,0.00,Paid
+INV-005,Epsilon Designs,2026-09-21,2026-09-28,1800.00,1800.00,0.00,Paid
+INV-006,Zeta Print Shop,2026-09-26,2026-10-03,1700.00,0.00,1700.00,Overdue
+INV-007,Eta Marketing,2026-10-01,2026-10-20,900.00,0.00,900.00,Pending

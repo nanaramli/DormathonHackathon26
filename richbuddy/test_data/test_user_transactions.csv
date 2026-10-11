@@ -1,0 +1,7 @@
+﻿Tx ID,Date,Entry Type,Category,Description,Amount,Linked Invoice
+TX001,2/9/2026,Income,Design,Logo project,1500,INV001
+TX002,3/9/2026,Expense,Supplies,Paper and ink,450,
+TX003,5/9/2026,Income,Printing,Banners,2200,INV002
+TX004,7/9/2026,Expense,Marketing,Ads,200,
+TX005,10/9/2026,Income,Design,Cards,800,INV003
+TX006,12/9/2026,Expense,Transport,Fuel,120,

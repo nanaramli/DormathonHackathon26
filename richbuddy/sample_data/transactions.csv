@@ -1,0 +1,13 @@
+﻿transaction_id,date,type,category,description,amount_rm,invoice_id
+T001,2026-09-02,income,Design,Logo design project,1500,INV001
+T002,2026-09-03,expense,Supplies,Printing paper and ink,450,
+T003,2026-09-05,income,Printing,Club event banners,2200,INV002
+T004,2026-09-07,expense,Marketing,Social media ads,200,
+T005,2026-09-10,income,Design,Business card design,800,INV003
+T006,2026-09-12,expense,Transport,Delivery and fuel,120,
+T007,2026-09-15,income,Printing,University merchandise,3000,INV004
+T008,2026-09-18,expense,Supplies,T-shirts and printing materials,1100,
+T009,2026-09-21,income,Design,Social media package,1800,INV005
+T010,2026-09-24,expense,Utilities,Internet and electricity,180,
+T011,2026-09-26,income,Printing,Flyers and brochures,1700,INV006
+T012,2026-09-28,expense,Software,Design software subscription,150,

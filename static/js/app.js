@@ -114,7 +114,13 @@ function setupUploadZone() {
 
     fileInput.addEventListener("change", (e) => {
         if (e.target.files.length > 0) {
-            selectedFiles = Array.from(e.target.files);
+            const newFiles = Array.from(e.target.files);
+            // Append to existing list (avoid duplicates by name+size)
+            newFiles.forEach((nf) => {
+                const exists = selectedFiles.some((sf) => sf.name === nf.name && sf.size === nf.size);
+                if (!exists) selectedFiles.push(nf);
+            });
+            fileInput.value = "";  // reset so same file can be re-selected
             handleFilesLoaded();
         }
     });
@@ -130,8 +136,11 @@ function setupUploadZone() {
         e.preventDefault();
         uploadZone.classList.remove("dragover");
         if (e.dataTransfer.files.length > 0) {
-            selectedFiles = Array.from(e.dataTransfer.files);
-            fileInput.files = e.dataTransfer.files;
+            const newFiles = Array.from(e.dataTransfer.files);
+            newFiles.forEach((nf) => {
+                const exists = selectedFiles.some((sf) => sf.name === nf.name && sf.size === nf.size);
+                if (!exists) selectedFiles.push(nf);
+            });
             handleFilesLoaded();
         }
     });
