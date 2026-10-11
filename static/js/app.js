@@ -439,7 +439,7 @@ function renderKPIs(findings) {
             out.overdue_amount > 0 ? fmtRM(out.overdue_amount) + " overdue" : "No overdue",
             out.total_outstanding > 0 ? "kpi-negative" : "kpi-positive"));
         cards.push(kpiCard("Collection Rate", out.collection_rate_pct + "%",
-            "Paid vs invoiced", out.collection_rate_pct >= 80 ? "kpi-positive" : "kpi-negative", true));
+            "Paid vs invoiced", out.collection_rate_pct >= 80 ? "kpi-positive" : "kpi-negative", "pct"));
     }
     if (findings.profit_by_category) {
         const pbc = findings.profit_by_category;
@@ -450,17 +450,17 @@ function renderKPIs(findings) {
     if (findings.expense_ratio) {
         const er = findings.expense_ratio;
         cards.push(kpiCard("Expense Ratio", er.expense_ratio_pct + "%",
-            `Top: ${er.top_expense_category}`, "kpi-neutral"));
+            `Top: ${er.top_expense_category}`, "kpi-neutral", "pct"));
     }
     if (findings.regional_analysis) {
         const ra = findings.regional_analysis;
-        cards.push(kpiCard("Regions", ra.total_regions, `Best: ${ra.best_region}`, "kpi-neutral"));
+        cards.push(kpiCard("Regions", ra.total_regions, `Best: ${ra.best_region}`, "kpi-neutral", "num"));
     }
     if (findings.revenue_concentration) {
         const rc = findings.revenue_concentration;
         cards.push(kpiCard("Top Category Share", rc.top_category_share_pct + "%",
             rc.is_concentrated ? "High concentration risk" : "Well diversified",
-            rc.is_concentrated ? "kpi-negative" : "kpi-positive"));
+            rc.is_concentrated ? "kpi-negative" : "kpi-positive", "pct"));
     }
 
     // Data Quality KPI
@@ -468,27 +468,24 @@ function renderKPIs(findings) {
         const dq = findings.data_quality;
         const dqClass = dq.score >= 75 ? "kpi-positive" : dq.score >= 60 ? "kpi-neutral" : "kpi-negative";
         cards.push(kpiCard("Data Quality", dq.score + "/100",
-            `Grade ${dq.grade} — ${dq.issues?.length || 0} issue(s)`, dqClass));
+            `Grade ${dq.grade} — ${dq.issues?.length || 0} issue(s)`, dqClass, "score"));
     }
 
     grid.innerHTML = cards.join("");
-
-    grid.querySelectorAll("[data-counter]").forEach((el) => {
-        animateCounter(el, parseFloat(el.dataset.counter), el.dataset.prefix || "");
-    });
 }
 
-function kpiCard(label, value, sub, valueClass, isNumeric) {
-    if (isNumeric) {
-        return `<div class="kpi-card">
-            <div class="kpi-label">${label}</div>
-            <div class="kpi-value ${valueClass}" data-counter="${value}" data-prefix="">0%</div>
-            <div class="kpi-sub">${sub}</div>
-        </div>`;
+function kpiCard(label, value, sub, valueClass, format) {
+    // format: "rm" (default currency) | "pct" (percent) | "score" (like 95/100) | "num" (plain number)
+    const fmt = format || "rm";
+    let displayValue;
+    if (fmt === "rm") {
+        displayValue = fmtRM(value);
+    } else {
+        displayValue = String(value);
     }
     return `<div class="kpi-card">
         <div class="kpi-label">${label}</div>
-        <div class="kpi-value ${valueClass}">${fmtRM(value)}</div>
+        <div class="kpi-value ${valueClass}">${displayValue}</div>
         <div class="kpi-sub">${sub}</div>
     </div>`;
 }
