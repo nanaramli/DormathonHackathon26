@@ -27,16 +27,28 @@ from intent_router import get_supported_intents
 # Paths
 # ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.join(BASE_DIR, "output")
-UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
-SAMPLE_DATA_DIR = os.path.join(BASE_DIR, "sample_data")
+IS_VERCEL = os.environ.get("VERCEL") is not None
+
+# On Vercel, the filesystem is read-only except /tmp
+if IS_VERCEL:
+    OUTPUT_DIR = "/tmp/richbuddy_output"
+    UPLOAD_DIR = "/tmp/richbuddy_uploads"
+else:
+    OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+    UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
+    SAMPLE_DATA_DIR = os.path.join(BASE_DIR, "sample_data")
 
 for d in (OUTPUT_DIR, UPLOAD_DIR):
     os.makedirs(d, exist_ok=True)
 
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"),
             static_folder=os.path.join(BASE_DIR, "static"))
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
+
+# Vercel serverless has a 4.5MB request body limit on Hobby plan
+if IS_VERCEL:
+    app.config["MAX_CONTENT_LENGTH"] = 4 * 1024 * 1024  # 4 MB
+else:
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
 
 
 # ---------------------------------------------------------------------------

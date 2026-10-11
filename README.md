@@ -1,9 +1,22 @@
-<<<<<<< HEAD
 # RichBuddy — Autonomous Business Co-Pilot for Student Entrepreneurs
 
 **Dormathon 2026 | Track 2: WorkBuddy (Agentic Solutions)**
 
 RichBuddy is a rule-based business intelligence agent that helps student entrepreneurs understand their business finances, identify profit improvement opportunities, and take affordable action — all without needing an LLM or internet connection.
+
+## Problem Statement
+
+Student entrepreneurs and small business owners collect sales records every day, but the data is hard to read. Spreadsheets don't show what is working or why, so low-margin products and declining categories go unnoticed until they have already drained profit.
+
+When everything seems important, choosing what to fix first becomes a guessing game instead of a strategy. Doing the calculations by hand also takes hours away from studying, marketing and serving customers, the work that actually grows the business.
+
+## Solution
+
+RichBuddy is an AI co-pilot that does the analysis so the owner doesn't have to.
+
+The user uploads their sales file and describes what they want to know in everyday language. From that single request, the agent works out its own plan, analyses the data, and produces a finished report with charts, a clear written summary and recommended next steps.
+
+Built on WorkBuddy, RichBuddy turns scattered sales records into straightforward guidance on what is selling, what is profitable and what to do next, saving hours of manual work and making business decisions easier for people without an analytics background.
 
 ## Features
 
@@ -23,19 +36,20 @@ RichBuddy is a rule-based business intelligence agent that helps student entrepr
 - **Frontend:** HTML, CSS, vanilla JavaScript, Chart.js
 - **Data:** openpyxl (Excel), csv module (CSV)
 - **Testing:** unittest (172 tests across 7 suites)
+- **Deployment:** Vercel (serverless)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.11+ 
+- Python 3.11+
 - Flask, openpyxl (install via pip)
 
 ### Installation
 
 ```bash
 cd richbuddy
-pip install flask openpyxl
+pip install -r requirements.txt
 ```
 
 ### Run the Web App
@@ -87,48 +101,42 @@ RichBuddy recognises many column name variations:
 
 ```
 richbuddy/
-├── web_app.py                 # Flask web server
-├── orchestrator.py            # 10-step autonomous pipeline coordinator
-├── self_verifier.py           # Independent verification engine (24+ checks)
-├── deliverable_generator.py   # Verified business deliverable generation
-├── business_strategy.py       # Student-focused recommendation engine
-├── intent_router.py           # Rule-based intent recognition (EN + Malay)
-├── smart_planner.py           # Dynamic plan builder (EN + Malay)
-├── data_loader.py             # Standard CSV/Excel loader
-├── adaptive_loader.py         # Adaptive multi-file loader with column mapping
-├── column_mapper.py           # 5-pass column detection system
-├── financial_analysis.py      # Net profit, margins, category profitability
-├── data_analysis.py           # Revenue, expense, monthly trends, invoices
-├── insights_generator.py      # AI-like insight cards and data quality scoring
-├── file_generator.py          # Text report and CSV output generation
-├── reconciliation.py          # Invoice vs transaction reconciliation
-├── action_pack_generator.py   # Customer messages and action plans
-├── file_inspector.py          # File format detection
-├── main.py                    # CLI entry point
-├── run_web.bat                # Batch file to start web server
+├── api/
+│   └── index.py              # Vercel serverless entry point
+├── web_app.py                # Flask web server
+├── orchestrator.py           # 10-step autonomous pipeline coordinator
+├── self_verifier.py          # Independent verification engine (24+ checks)
+├── deliverable_generator.py  # Verified business deliverable generation
+├── business_strategy.py      # Student-focused recommendation engine
+├── intent_router.py          # Rule-based intent recognition (EN + Malay)
+├── smart_planner.py          # Dynamic plan builder (EN + Malay)
+├── data_loader.py            # Standard CSV/Excel loader
+├── adaptive_loader.py        # Adaptive multi-file loader with column mapping
+├── column_mapper.py          # 5-pass column detection system
+├── financial_analysis.py     # Net profit, margins, category profitability
+├── data_analysis.py          # Revenue, expense, monthly trends, invoices
+├── insights_generator.py     # AI-like insight cards and data quality scoring
+├── file_generator.py         # Text report and CSV output generation
+├── reconciliation.py         # Invoice vs transaction reconciliation
+├── action_pack_generator.py  # Customer messages and action plans
+├── file_inspector.py         # File format detection
+├── main.py                   # CLI entry point
+├── vercel.json               # Vercel deployment config
+├── requirements.txt          # Python dependencies
+├── run_web.bat               # Batch file to start web server
 ├── templates/
-│   └── index.html             # Web UI
+│   └── index.html            # Web UI
 ├── static/
-│   ├── css/style.css          # Styling
-│   └── js/app.js              # Frontend logic
+│   ├── css/style.css         # Styling
+│   └── js/app.js             # Frontend logic
 ├── sample_data/
-│   ├── brownie_invoices.csv   # Student brownie business demo (20 invoices)
+│   ├── brownie_invoices.csv  # Student brownie business demo (20 invoices)
 │   ├── brownie_transactions.csv  # Demo transactions (40 records)
-│   ├── invoices.csv           # Basic sample data
-│   └── transactions.csv       # Basic sample data
-├── test_data/                 # Additional test datasets
-│   ├── invois_melayu.csv      # Malay-language test data
-│   └── transaksi_melayu.csv   # Malay transactions
-├── tests/                     # 172 automated tests
-│   ├── test_richbuddy_upgrade.py    # 39 tests (calculations, verification, demo)
-│   ├── test_business_strategy.py    # Recommendation logic tests
-│   ├── test_financial_analysis.py   # Financial calculation tests
-│   ├── test_data_loader.py          # Data loading tests
-│   ├── test_intent_router.py        # Intent recognition tests
-│   ├── test_orchestrator.py         # Pipeline integration tests
-│   └── test_smart_features.py       # Adaptive mapping tests
-├── output/                    # Generated analysis files
-└── README.md                  # This file
+│   ├── invoices.csv          # Basic sample data
+│   └── transactions.csv      # Basic sample data
+├── tests/                    # 172 automated tests
+├── output/                   # Generated analysis files
+└── README.md                 # This file
 ```
 
 ## The 10-Step Autonomous Workflow
@@ -177,39 +185,29 @@ Final status: SUCCESS / PARTIAL_SUCCESS / FAILED
 - JSON files are valid and parseable
 - Report contains required sections
 
+## Deployment
+
+### Vercel (Serverless)
+The app is configured for Vercel deployment:
+
+1. Push to GitHub
+2. Import the repo at [vercel.com](https://vercel.com)
+3. Vercel auto-detects the `vercel.json` and `requirements.txt`
+4. Deploy — the Flask app runs as a serverless function
+
+### Local
+```bash
+python web_app.py  # runs on http://localhost:5000
+```
+
 ## Limitations
 
 - Rule-based only (no LLM) — works offline, deterministic, no API costs
 - Expense allocation is proportional when explicit cost-of-goods-sold is not available
 - Malay support is keyword-based (not full NLP)
 - No multi-currency support (RM only)
-- Old output files auto-cleaned after 24 hours (keeps 5 most recent)
+- On Vercel: file download links are ephemeral (serverless /tmp filesystem)
 
 ## License
 
 Built for Dormathon 2026 Hackathon.
-=======
-# DormathonHackathon26
-Dormathon Hackathon 10-11 Oct 2026
-# RichBuddy 🐱💰
-### Autonomous Business Co-Pilot for Student Entrepreneurs
-
----
-
-## Problem Statement
-
-Student entrepreneurs and small business owners collect sales records every day, but the data is hard to read. Spreadsheets don't show what is working or why, so low-margin products and declining categories go unnoticed until they have already drained profit.
-
-When everything seems important, choosing what to fix first becomes a guessing game instead of a strategy. Doing the calculations by hand also takes hours away from studying, marketing and serving customers, the work that actually grows the business.
-
-## Solution
-
-RichBuddy is an AI co-pilot that does the analysis so the owner doesn't have to.
-
-The user uploads their sales file and describes what they want to know in everyday language. From that single request, the agent works out its own plan, analyses the data, and produces a finished report with charts, a clear written summary and recommended next steps.
-
-The owner stays in charge by approving the plan and reviewing the draft before anything is final.
-
-Built on WorkBuddy, RichBuddy turns scattered sales records into straightforward guidance on what is selling, what is profitable and what to do next, saving hours of manual work and making business decisions easier for people without an analytics background.
-
->>>>>>> 9c3244f6deda47eb808a93ce4b508491868dfaac
