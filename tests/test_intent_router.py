@@ -16,6 +16,7 @@ from intent_router import (
     INTENT_RETURNS_ANALYSIS,
     INTENT_PRIORITY_ACTIONS,
     INTENT_UNKNOWN,
+    INTENT_SMART_AUTO,
     get_supported_intents,
 )
 
@@ -63,13 +64,13 @@ class TestRecognizeIntent(unittest.TestCase):
         result = recognize_intent("Give me recommendations to improve my business")
         self.assertEqual(result["intent"], INTENT_PRIORITY_ACTIONS)
 
-    def test_unknown_intent(self):
+    def test_smart_auto_fallback(self):
         result = recognize_intent("What is the weather today?")
-        self.assertEqual(result["intent"], INTENT_UNKNOWN)
+        self.assertEqual(result["intent"], INTENT_SMART_AUTO)
 
-    def test_empty_instruction(self):
+    def test_empty_instruction_smart_auto(self):
         result = recognize_intent("")
-        self.assertEqual(result["intent"], INTENT_UNKNOWN)
+        self.assertEqual(result["intent"], INTENT_SMART_AUTO)
 
     def test_method_is_rule_based(self):
         result = recognize_intent("overall performance")
@@ -92,6 +93,7 @@ class TestGetSupportedIntents(unittest.TestCase):
         self.assertIn(INTENT_REGIONAL_COMPARISON, intent_names)
         self.assertIn(INTENT_RETURNS_ANALYSIS, intent_names)
         self.assertIn(INTENT_PRIORITY_ACTIONS, intent_names)
+        self.assertIn(INTENT_SMART_AUTO, intent_names)
 
     def test_each_has_description(self):
         intents = get_supported_intents()

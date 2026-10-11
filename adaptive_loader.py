@@ -15,6 +15,7 @@ orchestrator and analysis modules.
 
 import csv
 import os
+import re
 from datetime import datetime
 from typing import Any
 
@@ -27,6 +28,7 @@ from column_mapper import (
     get_required_invoice_fields,
     get_required_transaction_fields,
     _normalize,
+    _is_income_expense_keyword,
 )
 
 
@@ -144,6 +146,14 @@ def load_user_dataset(
                 invoices.extend(inv_data)
             else:
                 tx_data = _load_and_standardize_transactions(inspection, mapping, all_notes)
+                # SMART: Detect expense entries in unmapped columns
+                expense_txs = _detect_unmapped_expenses(inspection, mapping, all_notes)
+                if expense_txs:
+                    tx_data.extend(expense_txs)
+                    all_notes.append(
+                        f"SMART: {len(expense_txs)} expense transaction(s) "
+                        f"detected from unmapped columns and added to dataset."
+                    )
                 transactions.extend(tx_data)
         except FileInspectionError as e:
             raise AdaptiveLoadError(f"Cannot inspect file '{path}': {e}")
@@ -336,9 +346,24 @@ def _standardize_transaction_row(
     # Amount is required
     amount_str = get_val("amount")
     if not amount_str:
-        return None
-
-    amount = _parse_amount(amount_str, "amount", row_num)
+        # SMART FALLBACK: try computing amount from quantity x unit_price
+        qty_str = get_val("quantity")
+        price_str = get_val("unit_price")
+        if qty_str and price_str:
+            try:
+                qty = _parse_amount(qty_str, "quantity", row_num)
+                price = _parse_amount(price_str, "unit_price", row_num)
+                amount = qty * price
+                notes.append(
+                    f"Row {row_num}: amount computed from quantity ({qty}) "
+                    f"x unit_price ({price}) = {amount:.2f}."
+                )
+            except ValueError:
+                return None
+        else:
+            return None  # skip empty rows
+    else:
+        amount = _parse_amount(amount_str, "amount", row_num)
 
     # Type (infer if missing)
     if has_type_column:
@@ -376,6 +401,8 @@ def _standardize_transaction_row(
         # Pass through optional Phase 2 fields if detected
         "region": get_val("region") or "",
         "product": get_val("product") or "",
+        "quantity": get_val("quantity") or "",
+        "unit_price": get_val("unit_price") or "",
     }
 
 
@@ -514,6 +541,150 @@ def _score_mapping(mapping: dict[str, Any], all_fields: list[str]) -> int:
         if mapping["mapping"].get(field) is not None:
             score += 1
     return score
+
+
+# ---------------------------------------------------------------------------
+# SMART: Expense detection in unmapped columns
+# ---------------------------------------------------------------------------
+_EXPENSE_HEADER_KEYWORDS: set[str] = {
+    # English
+    "modal", "expense", "cost", "spent", "expenditure", "outlay", "outgoing",
+    "overhead", "capital", "investment", "spending",
+    # Malay
+    "kos", "belanja", "perbelanjaan", "pengeluaran", "belian", "modalawal",
+    "perbelanjaantambahan",
+}
+
+
+def _try_extract_number(text: str) -> float | None:
+    """Extract the first numeric value from a text string.
+
+    Handles formats like: "77", "RM 77", "77.50", "RM77.00",
+    "77 (20 packs)", "modal: 77", "rm 77.00 (20 packs)", etc.
+    """
+    if not text:
+        return None
+    cleaned = text
+    # Remove currency symbols and common prefixes
+    cleaned = re.sub(r"[Rr][Mm]\s*", "", cleaned)
+    cleaned = re.sub(r"[Mm][Yy][Rr]\s*", "", cleaned)
+    cleaned = cleaned.replace("$", "")
+    cleaned = cleaned.replace(",", "")
+    # Find the first number (integer or decimal)
+    match = re.search(r"\d+(?:\.\d+)?", cleaned)
+    if match:
+        try:
+            return float(match.group())
+        except ValueError:
+            return None
+    return None
+
+
+def _detect_unmapped_expenses(
+    inspection: dict[str, Any],
+    mapping: dict[str, str | None],
+    notes: list[str],
+) -> list[dict[str, Any]]:
+    """Detect expense entries in unmapped columns and create expense transactions.
+
+    Scans columns that weren't mapped to any expected field, looking for
+    expense-related headers (e.g., "Modal" in Malay, "Cost" in English) or
+    cell values containing expense keywords. When found, extracts numeric
+    values and creates synthetic expense transactions.
+
+    Handles two student-style layouts:
+    1. Same-cell: cell contains both label and value (e.g., "Modal: RM 77")
+    2. Adjacent columns: label in one column, value in the next (e.g.,
+       col[6]="Modal", col[7]="Rm 77" — common in informal student Excel)
+    """
+    mapped_col_names = {v for v in mapping.values() if v is not None}
+    expense_transactions: list[dict[str, Any]] = []
+    raw_rows = _read_raw_data(inspection)
+    # Track cells already used as value sources (prevents duplicates)
+    claimed_value_cells: set[tuple[int, int]] = set()
+
+    for col in inspection["columns"]:
+        col_name = col["name"]
+        if col_name in mapped_col_names:
+            continue  # skip mapped columns
+
+        col_name_lower = col_name.lower().strip() if col_name else ""
+        header_is_expense = any(
+            kw in col_name_lower for kw in _EXPENSE_HEADER_KEYWORDS
+        )
+        display_name = col_name if col_name else f"Column {col['index']}"
+
+        for row_idx, row in enumerate(raw_rows, start=2):
+            if col["index"] >= len(row):
+                continue
+            cell = str(row[col["index"]]).strip() if row[col["index"]] else ""
+            if not cell:
+                continue
+
+            cell_lower = cell.lower().strip()
+            cell_has_expense = any(
+                kw in cell_lower for kw in _EXPENSE_HEADER_KEYWORDS
+            )
+
+            # Skip if neither header nor cell has expense keyword
+            if not (header_is_expense or cell_has_expense):
+                continue
+
+            # Skip if this cell was already claimed as a value source
+            if (row_idx, col["index"]) in claimed_value_cells:
+                continue
+
+            # Try to extract number from this cell (same-cell layout)
+            amount = _try_extract_number(cell)
+            value_source = cell
+            source_desc = display_name
+
+            # If no number in this cell, check adjacent column to the right
+            # (student-style label-value layout)
+            if not amount:
+                next_idx = col["index"] + 1
+                if next_idx < len(row):
+                    next_cell = (
+                        str(row[next_idx]).strip()
+                        if row[next_idx] else ""
+                    )
+                    if next_cell:
+                        amount = _try_extract_number(next_cell)
+                        if amount and amount > 0:
+                            value_source = next_cell
+                            next_col = next(
+                                (c for c in inspection["columns"]
+                                 if c["index"] == next_idx),
+                                None,
+                            )
+                            next_display = (
+                                next_col["name"]
+                                if next_col and next_col["name"]
+                                else f"Column {next_idx}"
+                            )
+                            source_desc = f"{display_name} -> {next_display}"
+                            claimed_value_cells.add((row_idx, next_idx))
+
+            if amount and amount > 0:
+                expense_transactions.append({
+                    "transaction_id": f"EXPENSE_C{col['index']}_R{row_idx}",
+                    "date": "",
+                    "type": "expense",
+                    "category": "Capital/Initial Cost",
+                    "description": f"Expense: {cell} = {value_source}",
+                    "amount_rm": round(amount, 2),
+                    "invoice_id": "",
+                    "region": "",
+                    "product": "",
+                    "quantity": "",
+                    "unit_price": "",
+                })
+                notes.append(
+                    f"SMART: Detected expense in '{source_desc}': "
+                    f"RM {amount:.2f} (from '{cell}' = '{value_source}')."
+                )
+
+    return expense_transactions
 
 
 def format_adaptation_report(dataset: dict[str, Any]) -> str:

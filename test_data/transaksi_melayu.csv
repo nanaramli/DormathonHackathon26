@@ -1,0 +1,31 @@
+﻿Nombor Transaksi,Tarikh,Jenis,Kategori,Penerangan,Jumlah,Kuantiti,Harga Seunit,Kawasan
+TRX001,2026-01-05,pendapatan,Burger Special,Jualan burger kepada pelanggan,450.00,15,30.00,Lembah Pantai
+TRX002,2026-01-06,perbelanjaan,Bahan Mentah,Beli roti dan daging burger,180.00,,,Lembah Pantai
+TRX003,2026-01-08,pendapatan,Nasi Lemak Ayam,Jualan nasi lemak,200.00,10,20.00,Bangsar
+TRX004,2026-01-09,perbelanjaan,Utiliti,Bayar elektrik dan air,150.00,,,Bangsar
+TRX005,2026-01-10,pendapatan,Mee Goreng,Jualan mee goreng,0.00,0,0.00,Kerinchi
+TRX006,2026-01-11,perbelanjaan,Pengangkutan,Beli minyak petrol,80.00,,,Kerinchi
+TRX007,2026-01-12,pendapatan,Packet Set Keluarga,Jualan packet keluarga,550.00,5,110.00,Lembah Pantai
+TRX008,2026-01-14,perbelanjaan,Pemasaran,Iklan Facebook Ads,60.00,,,Lembah Pantai
+TRX009,2026-01-15,pendapatan,Air Sirap,Jualan air sirap,95.00,19,5.00,Bangsar
+TRX010,2026-01-18,pendapatan,Kuih Muih Set,Jualan kuih muih,100.00,10,10.00,Kerinchi
+TRX011,2026-01-20,pendapatan,Nasi Ayam Penyet,Jualan nasi ayam,400.00,8,50.00,Lembah Pantai
+TRX012,2026-01-22,perbelanjaan,Perkhidmatan,Bayar gaji pekerja sambilan,200.00,,,Lembah Pantai
+TRX013,2026-01-25,pendapatan,Catering Hari Jadi,Catering hari jadi pelanggan,680.00,1,680.00,Kerinchi
+TRX014,2026-01-28,pendapatan,Sup Tulang,Jualan sup tulang,150.00,5,30.00,Lembah Pantai
+TRX015,2026-02-01,perbelanjaan,Bahan Mentah,Beli bahan masak briyani,140.00,,,Bangsar
+TRX016,2026-02-05,pendapatan,Laksa Sarawak,Jualan laksa,430.00,10,43.00,Kerinchi
+TRX017,2026-02-08,perbelanjaan,Utiliti,Bayar elektrik,120.00,,,Kerinchi
+TRX018,2026-02-10,pendapatan,Asam Pedas Ikan,Jualan asam pedas,380.00,8,47.50,Bangsar
+TRX019,2026-02-12,pendapatan,Teh Tarik Set,Jualan teh tarik,80.00,10,8.00,Kerinchi
+TRX020,2026-02-15,perbelanjaan,Pengangkutan,Servis kereta,100.00,,,Kerinchi
+TRX021,2026-01-05,pendapatan,Burger Special,Bayaran pelanggan INV001,450.00,,,Lembah Pantai
+TRX022,2026-01-08,pendapatan,Nasi Lemak Ayam,Bayaran sebahagian INV002,200.00,,,Bangsar
+TRX023,2026-01-12,pendapatan,Packet Set Keluarga,Bayaran pelanggan INV004,550.00,,,Lembah Pantai
+TRX024,2026-01-15,pendapatan,Air Sirap,Bayaran pelanggan INV005,95.00,,,Bangsar
+TRX025,2026-01-18,pendapatan,Kuih Muih Set,Bayaran sebahagian INV006,100.00,,,Kerinchi
+TRX026,2026-01-20,pendapatan,Nasi Ayam Penyet,Bayaran pelanggan INV007,400.00,,,Lembah Pantai
+TRX027,2026-02-05,pendapatan,Laksa Sarawak,Bayaran pelanggan INV012,430.00,,,Kerinchi
+TRX028,2026-02-10,pendapatan,Asam Pedas Ikan,Bayaran pelanggan INV014,380.00,,,Bangsar
+TRX029,2026-02-12,pendapatan,Teh Tarik Set,Bayaran sebahagian INV015,80.00,,,Kerinchi
+TRX030,2026-02-01,pendapatan,Briyani Gam,Bayaran sebahagian INV011,200.00,,,Bangsar

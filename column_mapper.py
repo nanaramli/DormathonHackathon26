@@ -52,9 +52,9 @@ INVOICE_FIELDS: dict[str, list[str]] = {
     "invoice_amount": [
         "invoiceamountrm", "amount", "total", "invoicetotal", "invoiceamount",
         "value", "subtotal", "grandtotal", "amountdue", "billamount",
-        "charge", "fee", "price", "invoicevalue",
-        # Malay: jumlah, jumlah bayaran, nilai, jumlah keseluruhan
-        "jumlah", "jumlahbayaran", "nilai", "jumlahkeseluruhan", "caj", "harga",
+        "sales", "totalsales", "charge", "fee", "invoicevalue",
+        # Malay: jumlah, jumlah bayaran, nilai, jumlah keseluruhan, jualan
+        "jumlah", "jumlahbayaran", "nilai", "jumlahkeseluruhan", "caj", "harga", "jualan",
     ],
     "amount_paid": [
         "amountpaidrm", "paid", "amountpaid", "paymentreceived", "paidamount",
@@ -109,21 +109,39 @@ TRANSACTION_FIELDS: dict[str, list[str]] = {
     ],
     "category": [
         "category", "product", "service", "item", "itemname",
-        "productname", "classification", "group", "tag",
-        # Malay: kategori, produk, perkhidmatan, kumpulan
+        "productname", "classification", "group", "tag", "menu",
+        # Malay: kategori, produk, perkhidmatan, kumpulan, menu
         "kategori", "produk", "perkhidmatan", "kumpulan", "klasifikasi",
     ],
     "description": [
         "description", "details", "memo", "note", "notes", "remarks",
-        "comment", "narration", "particulars",
-        # Malay: penerangan, butiran, catatan, keterangan
+        "comment", "narration", "particulars", "nama", "name",
+        # Malay: penerangan, butiran, catatan, keterangan, nama
         "penerangan", "butiran", "catatan", "keterangan", "ulasan",
     ],
     "amount": [
-        "amountrm", "amount", "value", "price", "total", "cost",
-        "sum", "figure", "debit", "credit",
-        # Malay: jumlah, nilai, kos, harga, debit, kredit
-        "jumlah", "nilai", "kos", "harga", "debit", "kredit",
+        # High priority: total/actual transaction amounts (matched first)
+        "amountrm", "amount", "total", "totalsales", "totalamount",
+        "sales", "sum", "figure",
+        # Malay: jumlah (total), hasil (revenue), jualan (sales)
+        "jumlah", "jumlahjualan", "hasil", "jualan",
+        # Medium priority: generic value
+        "value", "nilai",
+        # Lower priority: per-unit prices (only if no total/sales column)
+        "price", "harga", "cost", "kos",
+        # Accounting terms
+        "debit", "credit", "kredit",
+    ],
+    "quantity": [
+        "quantity", "qty", "count", "unitssold", "unitcount",
+        "amountsold", "bilsold",
+        # Malay: kuantiti, bilangan, kiraan
+        "kuantiti", "bilangan", "kiraan",
+    ],
+    "unit_price": [
+        "unitprice", "priceperunit", "rate", "rateperunit", "unitcost",
+        # Malay: harga seunit, kos seunit
+        "hargaseunit", "kosseunit",
     ],
     "invoice_id": [
         "invoiceid", "invoiceref", "refinvoice", "linkedinvoice",
@@ -146,6 +164,39 @@ def _normalize(name: str) -> str:
     # Remove common separators and punctuation
     name = re.sub(r"[\s_\-./()]+", "", name)
     return name
+
+
+# ---------------------------------------------------------------------------
+# Income/expense keyword sets for value-based type validation (Pass 4)
+# ---------------------------------------------------------------------------
+_INCOME_KEYWORDS: set[str] = {
+    # English
+    "income", "credit", "in", "receipt", "revenue", "sale", "sales",
+    "inflow", "deposit", "earning", "gain", "profit", "incoming",
+    # Malay
+    "pendapatan", "hasil", "jualan", "penerimaan", "untung", "masuk",
+}
+
+_EXPENSE_KEYWORDS: set[str] = {
+    # English
+    "expense", "debit", "out", "payment", "cost", "spend", "bill",
+    "outflow", "withdrawal", "loss", "outgoing", "purchase",
+    # Malay
+    "perbelanjaan", "belanja", "pengeluaran", "kos", "bayaran", "keluar",
+    "belian",
+}
+
+
+def _is_income_expense_keyword(value: str) -> bool:
+    """Check if a string value is a recognized income or expense keyword.
+
+    Used by Pass 4 to determine whether a column mapped to `type` actually
+    contains income/expense indicators or something else (e.g., product names).
+    """
+    value = value.lower().strip()
+    # Remove common punctuation that might be attached
+    value = re.sub(r"[\s_\-./()]+", "", value)
+    return value in _INCOME_KEYWORDS or value in _EXPENSE_KEYWORDS
 
 
 def map_columns(
@@ -226,6 +277,97 @@ def map_columns(
                 )
                 break
 
+    # ---- Pass 4: Value-based validation (SMART RE-MAPPING) ----
+    # If a column was mapped to `type` but its sample values aren't income/expense
+    # keywords, the column likely contains product/item names or other text.
+    # Remap it to `category` or `description` instead.
+    # This handles files like student sales records where "Type" = product name.
+    if mapping.get("type") is not None:
+        type_col_name = mapping["type"]
+        type_col = next(
+            (c for c in inspection["columns"] if c["name"] == type_col_name),
+            None,
+        )
+        if type_col:
+            sample_vals = [
+                v.lower().strip() for v in type_col.get("sample_values", [])
+            ]
+            if sample_vals:
+                recognized = sum(
+                    1 for v in sample_vals if _is_income_expense_keyword(v)
+                )
+                if recognized / len(sample_vals) < 0.3:
+                    # Values aren't income/expense — remap to text field
+                    claimed_cols.discard(type_col_name)
+                    mapping["type"] = None
+                    notes.append(
+                        f"SMART: Column '{type_col_name}' was initially mapped to "
+                        f"'type' but its values (e.g., {', '.join(sample_vals[:3])}) "
+                        f"don't look like income/expense keywords. Remapping to a "
+                        f"text field."
+                    )
+                    # Try category first (product names fit better as categories),
+                    # then description as fallback
+                    for target in ("category", "description"):
+                        if mapping.get(target) is None:
+                            mapping[target] = type_col_name
+                            claimed_cols.add(type_col_name)
+                            notes.append(
+                                f"SMART: Column '{type_col_name}' remapped to "
+                                f"'{target}'."
+                            )
+                            break
+
+    # ---- Pass 5: Amount priority refinement (SMART SELECTION) ----
+    # If `amount` was mapped to a per-unit-price column (e.g., "Unit Price"),
+    # try to find a better total-amount column. If none found but quantity
+    # exists, remap to unit_price so amount can be computed as qty x price.
+    if mapping.get("amount") is not None:
+        amount_col_name = mapping["amount"]
+        amount_col_norm = _normalize(amount_col_name)
+        # Check if the mapped column name looks like a per-unit price
+        unit_price_indicators = ("price", "harga", "unitprice", "rate")
+        is_likely_unit_price = any(
+            ind in amount_col_norm for ind in unit_price_indicators
+        )
+        if is_likely_unit_price:
+            # Look for a better total-amount column among unmapped columns
+            total_indicators = (
+                "total", "sales", "jualan", "hasil", "jumlah",
+                "sum", "grandtotal", "subtotal",
+            )
+            found_better = False
+            for col in inspection["columns"]:
+                col_name = col["name"]
+                if col_name in claimed_cols:
+                    continue
+                col_norm = _normalize(col_name)
+                if any(ind in col_norm for ind in total_indicators):
+                    # Found a better column — switch
+                    claimed_cols.discard(amount_col_name)
+                    mapping["amount"] = col_name
+                    claimed_cols.add(col_name)
+                    notes.append(
+                        f"SMART: Amount field re-mapped from '{amount_col_name}' "
+                        f"(per-unit price) to '{col_name}' (total amount) "
+                        f"for better accuracy."
+                    )
+                    found_better = True
+                    break
+
+            # If no better total column found AND quantity column exists,
+            # remap to unit_price so amount = quantity x unit_price can be computed
+            if not found_better and mapping.get("quantity") is not None:
+                claimed_cols.discard(amount_col_name)
+                mapping["amount"] = None
+                mapping["unit_price"] = amount_col_name
+                notes.append(
+                    f"SMART: Column '{amount_col_name}' looks like a per-unit "
+                    f"price and a quantity column exists. Remapping to "
+                    f"'unit_price' — amount will be computed as "
+                    f"quantity x unit_price."
+                )
+
     # ---- Fill in None for unmatched fields ----
     for field in field_aliases:
         if field not in mapping:
@@ -269,4 +411,4 @@ def get_recommended_invoice_fields() -> list[str]:
 
 def get_recommended_transaction_fields() -> list[str]:
     """Fields that make transaction analysis more complete (but not strictly required)."""
-    return ["date", "type", "category", "description"]
+    return ["date", "type", "category", "description", "quantity", "unit_price"]

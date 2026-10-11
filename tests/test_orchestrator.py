@@ -306,13 +306,13 @@ class TestRunAnalysisUnknown(unittest.TestCase):
         self.outdir = os.path.join(self.tmpdir, "output")
         self.dataset = _create_sample_dataset(self.tmpdir)
 
-    def test_unknown_intent_handled(self):
+    def test_smart_auto_fallback_handled(self):
         result = run_analysis(
             "What is the weather today?",
             self.dataset,
             self.outdir,
         )
-        self.assertEqual(result["intent"], "unknown")
+        self.assertEqual(result["intent"], "smart_auto")
         self.assertTrue(len(result["data_notes"]) > 0)
         # Should still generate a report
         self.assertTrue(os.path.isfile(result["report_path"]))

@@ -126,7 +126,7 @@ class TestPrioritizeActions(unittest.TestCase):
             "total_profit": -50.0,
         }
         actions = prioritize_actions(findings)
-        loss_action = [a for a in actions if "loss" in a["title"].lower()]
+        loss_action = [a for a in actions if "loss" in a["title"].lower() or "lose money" in a["title"].lower()]
         self.assertTrue(len(loss_action) > 0)
 
 

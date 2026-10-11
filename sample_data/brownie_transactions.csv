@@ -1,0 +1,41 @@
+﻿transaction_id,date,type,category,description,amount_rm,quantity,unit_price,invoice_id
+TXN001,2026-01-05,income,Classic Fudge Brownie,Sale - 6pcs brownie,24.00,6,4.00,BRW001
+TXN002,2026-01-05,expense,Raw Ingredients,Bought chocolate and flour,35.00,,,TXN002
+TXN003,2026-01-06,expense,Packaging,Bought brownie boxes and bags,20.00,,,
+TXN004,2026-01-07,income,Brownie Box (12pcs),Sale - brownie box,40.00,1,40.00,BRW002
+TXN005,2026-01-08,expense,Transport,Grab to deliver ingredients,12.00,,,
+TXN006,2026-01-10,income,Classic Fudge Brownie,Sale - 4pcs brownie,16.00,4,4.00,BRW003
+TXN007,2026-01-10,expense,Raw Ingredients,Bought butter and sugar,28.00,,,
+TXN008,2026-01-12,income,Brownie Box (12pcs),Sale - brownie box,60.00,1,60.00,BRW004
+TXN009,2026-01-14,expense,Marketing,Instagram ads,15.00,,,
+TXN010,2026-01-15,income,Blondie Bar,Sale - 5pcs blondie,15.00,5,3.00,BRW005
+TXN011,2026-01-16,expense,Utilities,Electricity for oven,18.00,,,
+TXN012,2026-01-18,income,Vegan Brownie,Sale - 6pcs vegan brownie,30.00,6,5.00,BRW006
+TXN013,2026-01-18,expense,Raw Ingredients,Bought cocoa powder,22.00,,,
+TXN014,2026-01-20,income,Brownie Box (12pcs),Sale - brownie box,45.00,1,45.00,BRW007
+TXN015,2026-01-20,expense,Packaging,Bought more boxes,15.00,,,
+TXN016,2026-01-22,income,Classic Fudge Brownie,Sale - 3pcs brownie,12.00,3,4.00,BRW008
+TXN017,2026-01-25,income,Brownie Box (12pcs),Sale - brownie box,48.00,1,48.00,BRW009
+TXN018,2026-01-25,expense,Raw Ingredients,Bought chocolate and eggs,30.00,,,
+TXN019,2026-01-28,income,Blondie Bar,Sale - 4pcs blondie,20.00,4,5.00,BRW010
+TXN020,2026-01-28,expense,Transport,Delivery fuel,10.00,,,
+TXN021,2026-02-01,income,Classic Fudge Brownie,Sale - 9pcs brownie,36.00,9,4.00,BRW011
+TXN022,2026-02-01,expense,Marketing,Instagram story promotion,10.00,,,
+TXN023,2026-02-05,income,Brownie Box (12pcs),Sale - brownie box,40.00,1,40.00,BRW012
+TXN024,2026-02-05,expense,Raw Ingredients,Bought flour and sugar,25.00,,,
+TXN025,2026-02-08,income,Vegan Brownie,Sale - 2pcs vegan brownie,10.00,2,5.00,BRW013
+TXN026,2026-02-08,expense,Utilities,Electricity,15.00,,,
+TXN027,2026-02-10,income,Brownie Box (12pcs),Sale - brownie box,60.00,1,60.00,BRW014
+TXN028,2026-02-10,expense,Packaging,Bought gift boxes,20.00,,,
+TXN029,2026-02-12,income,Classic Fudge Brownie,Sale - 4pcs brownie,16.00,4,4.00,BRW015
+TXN030,2026-02-12,expense,Raw Ingredients,Bought butter and vanilla,32.00,,,
+TXN031,2026-02-14,income,Blondie Bar,Sale - 5pcs blondie,15.00,5,3.00,BRW016
+TXN032,2026-02-14,expense,Transport,Delivery to customers,8.00,,,
+TXN033,2026-02-18,income,Brownie Box (12pcs),Sale - brownie box,40.00,1,40.00,BRW017
+TXN034,2026-02-18,expense,Marketing,Flyers printing,12.00,,,
+TXN035,2026-02-20,income,Classic Fudge Brownie,Sale - 6pcs brownie,24.00,6,4.00,BRW018
+TXN036,2026-02-20,expense,Raw Ingredients,Bought chocolate and nuts,38.00,,,
+TXN037,2026-02-22,income,Vegan Brownie,Sale - 2pcs vegan brownie,10.00,2,5.00,BRW019
+TXN038,2026-02-22,expense,Utilities,Electricity,15.00,,,
+TXN039,2026-02-25,income,Brownie Box (12pcs),Sale - brownie box,45.00,1,45.00,BRW020
+TXN040,2026-02-25,expense,Packaging,Bought bags and labels,18.00,,,

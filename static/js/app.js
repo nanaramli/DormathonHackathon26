@@ -1,60 +1,17 @@
 /* ===== State ===== */
 let selectedFiles = [];
-let useSampleData = false;
 let loadedFileInfo = null;
 let chartInstances = {};
-let currentPanel = "data";
-
-/* ===== Quick Analysis Definitions ===== */
-const QUICK_ANALYSES = [
-    {
-        intent: "overall_performance",
-        icon: "\uD83D\uDCCA",
-        title: "Overall Performance",
-        desc: "Revenue, expenses, profit & cash flow overview",
-        instruction: "Analyse my overall business performance",
-    },
-    {
-        intent: "profit_loss_products",
-        icon: "\uD83D\uDCB0",
-        title: "Profit & Loss",
-        desc: "Which products make or lose money",
-        instruction: "Which products are making the most profit, and which are losing money?",
-    },
-    {
-        intent: "regional_comparison",
-        icon: "\uD83D\uDDFA\uFE0F",
-        title: "Regional Comparison",
-        desc: "Sales & profitability across regions",
-        instruction: "Compare my sales and profitability across regions",
-    },
-    {
-        intent: "returns_analysis",
-        icon: "\uD83D\uDED0",
-        title: "Returns & Risk",
-        desc: "Product returns and unpaid invoice risk",
-        instruction: "Analyse product returns and explain how they relate to sales",
-    },
-    {
-        intent: "priority_actions",
-        icon: "\uD83C\uDFAF",
-        title: "Top Actions",
-        desc: "Prioritized recommendations to improve",
-        instruction: "What are the three most important actions I should take to improve my business?",
-    },
-];
+let currentPanel = "home";
 
 /* ===== DOM ===== */
 const $ = (id) => document.getElementById(id);
 const uploadZone = $("uploadZone");
 const fileInput = $("fileInput");
-const sampleDataBtn = $("sampleDataBtn");
 const loadedFilesInfo = $("loadedFilesInfo");
 const dataSummaryBox = $("dataSummaryBox");
 const statusPill = $("statusPill");
 const statusText = $("statusText");
-const analysisCard = $("panel-analysis");
-const quickButtons = $("quickButtons");
 const instructionInput = $("instructionInput");
 const analyzeBtn = $("analyzeBtn");
 const loadingBar = $("loadingBar");
@@ -71,12 +28,12 @@ const tabsBar = $("tabsBar");
 
 /* ===== Init ===== */
 document.addEventListener("DOMContentLoaded", () => {
-    renderQuickButtons();
     setupUploadZone();
     setupAnalyzeButton();
     setupSidebar();
     setupTabs();
     setupScrollProgress();
+    updateAnalyzeButton();
 });
 
 /* ===== Sidebar ===== */
@@ -112,7 +69,7 @@ function switchPanel(panelId) {
         if (n.dataset.panel === panelId) n.classList.add("active");
     });
 
-    const titles = { data: "Data Source", analysis: "Analysis", results: "Results" };
+    const titles = { home: "Start", results: "Results" };
     topbarTitle.textContent = titles[panelId] || "Dashboard";
     currentPanel = panelId;
 
@@ -151,25 +108,6 @@ function setupScrollProgress() {
     });
 }
 
-/* ===== Quick Buttons ===== */
-function renderQuickButtons() {
-    quickButtons.innerHTML = "";
-    QUICK_ANALYSES.forEach((qa) => {
-        const btn = document.createElement("button");
-        btn.className = "quick-btn";
-        btn.innerHTML = `
-            <div class="qb-icon">${qa.icon}</div>
-            <div class="qb-title">${qa.title}</div>
-            <div class="qb-desc">${qa.desc}</div>
-        `;
-        btn.addEventListener("click", () => {
-            instructionInput.value = qa.instruction;
-            runAnalysis();
-        });
-        quickButtons.appendChild(btn);
-    });
-}
-
 /* ===== Upload Zone ===== */
 function setupUploadZone() {
     uploadZone.addEventListener("click", () => fileInput.click());
@@ -177,7 +115,6 @@ function setupUploadZone() {
     fileInput.addEventListener("change", (e) => {
         if (e.target.files.length > 0) {
             selectedFiles = Array.from(e.target.files);
-            useSampleData = false;
             handleFilesLoaded();
         }
     });
@@ -194,16 +131,9 @@ function setupUploadZone() {
         uploadZone.classList.remove("dragover");
         if (e.dataTransfer.files.length > 0) {
             selectedFiles = Array.from(e.dataTransfer.files);
-            useSampleData = false;
             fileInput.files = e.dataTransfer.files;
             handleFilesLoaded();
         }
-    });
-
-    sampleDataBtn.addEventListener("click", () => {
-        useSampleData = true;
-        selectedFiles = [];
-        loadSampleData();
     });
 }
 
@@ -211,7 +141,7 @@ function setupUploadZone() {
 function handleFilesLoaded() {
     if (selectedFiles.length === 0) return;
 
-    let html = "<h4>&#9989; Files Ready</h4>";
+    let html = '<h4>&#9989; Files Ready</h4>';
     selectedFiles.forEach((f, i) => {
         const ext = f.name.split(".").pop().toLowerCase();
         html += `<div class="file-chip">
@@ -223,12 +153,10 @@ function handleFilesLoaded() {
             </button>
         </div>`;
     });
-    html += `<p style="font-size:13px;color:var(--text-3);margin-top:8px;">Continue to analysis when ready.</p>`;
     loadedFilesInfo.innerHTML = html;
     loadedFilesInfo.style.display = "block";
     dataSummaryBox.style.display = "none";
 
-    // Remove buttons
     loadedFilesInfo.querySelectorAll(".file-remove").forEach((btn) => {
         btn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -239,49 +167,13 @@ function handleFilesLoaded() {
             } else {
                 handleFilesLoaded();
             }
+            updateAnalyzeButton();
         });
     });
 
-    // Update status
     updateStatus("ok", `${selectedFiles.length} file${selectedFiles.length > 1 ? "s" : ""} ready`);
-
-    // Navigate to analysis panel
-    enableNav("analysis");
-    switchPanel("analysis");
     resetBtn.style.display = "flex";
-}
-
-/* ===== Sample Data ===== */
-async function loadSampleData() {
-    sampleDataBtn.disabled = true;
-    sampleDataBtn.style.opacity = "0.6";
-    showToast("Loading sample data...", "info");
-
-    try {
-        const resp = await fetch("/api/sample", { method: "POST" });
-        const data = await resp.json();
-
-        if (!resp.ok) {
-            showToast(data.error || "Failed to load sample data", "error");
-            return;
-        }
-
-        loadedFileInfo = data;
-        useSampleData = true;
-        renderDataSummary(data, "Sample Dataset");
-        updateStatus("ok", "Sample data loaded");
-
-        loadedFilesInfo.style.display = "none";
-        enableNav("analysis");
-        switchPanel("analysis");
-        resetBtn.style.display = "flex";
-        showToast("Sample data loaded successfully!", "success");
-    } catch (e) {
-        showToast("Network error: " + e.message, "error");
-    } finally {
-        sampleDataBtn.disabled = false;
-        sampleDataBtn.style.opacity = "";
-    }
+    updateAnalyzeButton();
 }
 
 /* ===== Data Summary ===== */
@@ -318,8 +210,8 @@ function renderDataSummary(data, sourceLabel) {
         <div class="summary-grid">
             <div class="summary-item"><div class="value">${data.invoice_count || 0}</div><div class="label">Invoices</div></div>
             <div class="summary-item"><div class="value">${data.transaction_count || 0}</div><div class="label">Transactions</div></div>
-            <div class="summary-item"><div class="value">${s.income_transaction_count || 0}</div><div class="label">Income Records</div></div>
-            <div class="summary-item"><div class="value">${s.expense_transaction_count || 0}</div><div class="label">Expense Records</div></div>
+            <div class="summary-item"><div class="value">${s.income_transaction_count || 0}</div><div class="label">Income</div></div>
+            <div class="summary-item"><div class="value">${s.expense_transaction_count || 0}</div><div class="label">Expenses</div></div>
         </div>
         <div class="summary-tags">${tags}</div>
         ${notesHtml}
@@ -327,18 +219,26 @@ function renderDataSummary(data, sourceLabel) {
     dataSummaryBox.style.display = "block";
 }
 
+/* ===== Analyze Button Enable/Disable ===== */
+function updateAnalyzeButton() {
+    const hasPrompt = instructionInput.value.trim().length > 0;
+    const hasData = selectedFiles.length > 0;
+    analyzeBtn.disabled = !(hasPrompt && hasData);
+}
+
 /* ===== Run Analysis ===== */
 function setupAnalyzeButton() {
     analyzeBtn.addEventListener("click", () => runAnalysis());
     instructionInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") runAnalysis();
+        if (e.key === "Enter" && !analyzeBtn.disabled) runAnalysis();
     });
+    instructionInput.addEventListener("input", () => updateAnalyzeButton());
 
     resetBtn.addEventListener("click", () => {
         selectedFiles = [];
-        useSampleData = false;
         loadedFileInfo = null;
         fileInput.value = "";
+        instructionInput.value = "";
         loadedFilesInfo.style.display = "none";
         dataSummaryBox.style.display = "none";
         resultsSection.querySelector(".kpi-grid").innerHTML = "";
@@ -346,10 +246,11 @@ function setupAnalyzeButton() {
         resultsSection.querySelector("#tablesSection").innerHTML = "";
         updateStatus("", "No data loaded");
         document.querySelectorAll(".nav-item").forEach((n) => {
-            if (n.dataset.panel !== "data") n.classList.add("disabled");
+            if (n.dataset.panel !== "home") n.classList.add("disabled");
         });
         resetBtn.style.display = "none";
-        switchPanel("data");
+        switchPanel("home");
+        updateAnalyzeButton();
         showToast("Ready for new data.", "info");
     });
 }
@@ -357,11 +258,11 @@ function setupAnalyzeButton() {
 async function runAnalysis() {
     const instruction = instructionInput.value.trim();
     if (!instruction) {
-        showToast("Please enter or select an analysis instruction.", "error");
+        showToast("Please type what you need.", "error");
         return;
     }
-    if (!useSampleData && selectedFiles.length === 0) {
-        showToast("Upload files or use sample data first.", "error");
+    if (selectedFiles.length === 0) {
+        showToast("Upload files first.", "error");
         return;
     }
 
@@ -371,8 +272,8 @@ async function runAnalysis() {
 
     const formData = new FormData();
     formData.append("instruction", instruction);
-    formData.append("use_sample", useSampleData ? "true" : "false");
-    if (!useSampleData) selectedFiles.forEach((f) => formData.append("files", f));
+    formData.append("use_sample", "false");
+    selectedFiles.forEach((f) => formData.append("files", f));
 
     try {
         const resp = await fetch("/api/analyze", { method: "POST", body: formData });
@@ -392,14 +293,6 @@ async function runAnalysis() {
             };
         }
 
-        if (!loadedFileInfo && data.dataset_summary) {
-            renderDataSummary({
-                invoice_count: data.dataset_summary.invoice_count,
-                transaction_count: data.dataset_summary.transaction_count,
-                summary: data.dataset_summary,
-            }, "Uploaded Data");
-        }
-
         renderResults(data);
         showToast("Analysis complete!", "success");
     } catch (e) {
@@ -417,18 +310,27 @@ function renderResults(result) {
 
     enableNav("results");
 
-    renderIntentBanner(result);
+    renderPipelineProgress(result);
     renderKPIs(result.findings || {});
+    renderRecommendations(result.actions || []);
     renderCharts(result.findings || {});
     renderTables(result.findings || {});
-    renderRecommendations(result.actions || []);
+    renderInsights(result.smart_insights || []);
     renderDataNotes(result.data_notes || []);
     renderOutputFiles(result);
 
-    // Show tabs bar
+    const hasReconciliation = result.findings?.reconciliation;
+    const hasCustomerMessages = result.findings?.customer_messages;
+
+    if (hasReconciliation) {
+        renderReconciliation(result.findings.reconciliation);
+    }
+    if (hasCustomerMessages) {
+        renderCustomerMessages(result.findings.customer_messages);
+    }
+
     tabsBar.style.display = "flex";
 
-    // Default to charts tab
     document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
     document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
     document.querySelector('.tab[data-tab="charts"]').classList.add("active");
@@ -437,21 +339,77 @@ function renderResults(result) {
     switchPanel("results");
 }
 
-/* ===== Intent Banner ===== */
-function renderIntentBanner(result) {
-    const intentLabel = (result.intent || "unknown").replace(/_/g, " ").toUpperCase();
-    const confidence = result.confidence || "N/A";
-    const method = result.method || "N/A";
+/* ===== Smart Plan Banner (REMOVED per user request) ===== */
+// renderSmartPlanBanner function removed — GOAL DETERMINED card no longer shows on Results page.
 
-    $("intentBanner").innerHTML = `
-        <div class="ib-intent">${intentLabel}</div>
-        <div class="ib-instruction">"${escapeHtml(result.instruction || "")}"</div>
-        <div class="ib-meta">
-            <span class="meta-chip">Confidence: ${escapeHtml(confidence)}</span>
-            <span class="meta-chip">Method: ${escapeHtml(method)}</span>
-            ${result.description ? `<span class="meta-chip">${escapeHtml(result.description)}</span>` : ""}
-        </div>
-    `;
+/* ===== Pipeline Progress ===== */
+function renderPipelineProgress(result) {
+    const el = $("pipelineProgress");
+    const steps = result.pipeline_steps;
+    if (!steps || steps.length === 0) {
+        el.style.display = "none";
+        return;
+    }
+
+    const stepsHtml = steps.map((s, i) => {
+        const delay = i * 0.1;
+        return `<div class="pp-step ${s.status}" style="animation: panelIn 0.3s ease ${delay}s both;">
+            <div class="pp-step-icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <div class="pp-step-body">
+                <div class="pp-step-name">${esc(s.name)}</div>
+                <div class="pp-step-detail">${esc(s.detail)}</div>
+            </div>
+        </div>`;
+    }).join("");
+
+    el.innerHTML = `<div class="pp-track">${stepsHtml}</div>`;
+    el.style.display = "block";
+}
+
+/* ===== Smart Insights ===== */
+function renderInsights(insights) {
+    const list = $("insightsList");
+    const badge = $("tabBadgeInsights");
+
+    if (!insights || insights.length === 0) {
+        badge.style.display = "none";
+        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No insights for this analysis.</p>';
+        return;
+    }
+
+    badge.style.display = "inline-flex";
+    badge.textContent = insights.length;
+
+    list.innerHTML = insights.map((ins, i) => {
+        const colorMap = {1: "var(--danger)", 2: "var(--warning)", 3: "var(--success)"};
+        const labelMap = {1: "Critical", 2: "Important", 3: "Good"};
+        const color = colorMap[ins.priority] || "var(--primary)";
+        const label = labelMap[ins.priority] || "Info";
+
+        return `<div class="insight-card priority-${ins.priority}" style="animation: panelIn 0.4s ease ${i * 0.08}s both;">
+            <div class="insight-header">
+                <span class="insight-badge" style="background:${color};">${label}</span>
+                <span class="insight-category">${esc(ins.category)}</span>
+            </div>
+            <div class="insight-title">${esc(ins.title)}</div>
+            <div class="insight-section">
+                <div class="insight-label">Finding</div>
+                <div class="insight-text">${esc(ins.finding)}</div>
+            </div>
+            <div class="insight-section">
+                <div class="insight-label">Recommendation</div>
+                <div class="insight-text">${esc(ins.recommendation)}</div>
+            </div>
+            <div class="insight-section">
+                <div class="insight-label">Why It Matters</div>
+                <div class="insight-text insight-rationale">${esc(ins.rationale)}</div>
+            </div>
+        </div>`;
+    }).join("");
 }
 
 /* ===== KPI Cards ===== */
@@ -496,9 +454,16 @@ function renderKPIs(findings) {
             rc.is_concentrated ? "kpi-negative" : "kpi-positive"));
     }
 
+    // Data Quality KPI
+    if (findings.data_quality) {
+        const dq = findings.data_quality;
+        const dqClass = dq.score >= 75 ? "kpi-positive" : dq.score >= 60 ? "kpi-neutral" : "kpi-negative";
+        cards.push(kpiCard("Data Quality", dq.score + "/100",
+            `Grade ${dq.grade} — ${dq.issues?.length || 0} issue(s)`, dqClass));
+    }
+
     grid.innerHTML = cards.join("");
 
-    // Animate counters
     grid.querySelectorAll("[data-counter]").forEach((el) => {
         animateCounter(el, parseFloat(el.dataset.counter), el.dataset.prefix || "");
     });
@@ -624,7 +589,7 @@ function renderCharts(findings) {
         const statuses = Object.keys(ist.by_status);
         if (statuses.length > 0) {
             charts.push({
-                title: "Invoice Status Distribution",
+                title: "Invoice Status",
                 canvasId: "chartInvoiceStatus",
                 render: () => {
                     const cm = { paid: "rgba(5,150,105,0.75)", overdue: "rgba(220,38,38,0.75)", pending: "rgba(217,119,6,0.75)", cancelled: "rgba(100,116,139,0.6)", partial: "rgba(217,119,6,0.5)" };
@@ -706,11 +671,9 @@ function renderTables(findings) {
         ]));
     }
     if (findings.profit_by_category && findings.profit_by_category.categories) {
-        tables.push(buildTable("Profitability by Category (Estimated)", findings.profit_by_category.categories, [
+        tables.push(buildTable("Profitability by Category", findings.profit_by_category.categories, [
             { key: "category", label: "Category" },
             { key: "revenue", label: "Revenue", fmt: "rm" },
-            { key: "direct_cost", label: "Direct Cost", fmt: "rm" },
-            { key: "overhead_cost", label: "Overhead", fmt: "rm" },
             { key: "total_cost", label: "Total Cost", fmt: "rm" },
             { key: "profit", label: "Profit", fmt: "rm", sign: true },
             { key: "profit_margin_pct", label: "Margin", fmt: "pct" },
@@ -720,7 +683,7 @@ function renderTables(findings) {
     if (findings.invoice_status && findings.invoice_status.by_status) {
         const ist = findings.invoice_status;
         const rows = Object.keys(ist.by_status).map((s) => ({ status: s, count: ist.by_status[s], total_amount_rm: ist.by_status_amount[s] || 0 }));
-        tables.push(buildTable("Invoice Status Breakdown", rows, [
+        tables.push(buildTable("Invoice Status", rows, [
             { key: "status", label: "Status" }, { key: "count", label: "Count" }, { key: "total_amount_rm", label: "Total Amount", fmt: "rm" },
         ]));
     }
@@ -730,7 +693,7 @@ function renderTables(findings) {
         if (rows.length > 0) {
             tables.push(buildTable("Overdue & Pending Invoices", rows, [
                 { key: "invoice_id", label: "Invoice ID" }, { key: "customer_name", label: "Customer" },
-                { key: "issue_date", label: "Issued" }, { key: "due_date", label: "Due" },
+                { key: "due_date", label: "Due" },
                 { key: "invoice_amount_rm", label: "Amount", fmt: "rm" }, { key: "amount_paid_rm", label: "Paid", fmt: "rm" },
                 { key: "balance_due_rm", label: "Balance", fmt: "rm" }, { key: "status", label: "Status" },
             ]));
@@ -747,7 +710,7 @@ function renderTables(findings) {
     if (findings.regional_analysis && findings.regional_analysis.regions) {
         tables.push(buildTable("Regional Analysis", findings.regional_analysis.regions, [
             { key: "region", label: "Region" }, { key: "revenue", label: "Revenue", fmt: "rm" },
-            { key: "expense", label: "Expense", fmt: "rm" }, { key: "profit", label: "Profit", fmt: "rm", sign: true },
+            { key: "profit", label: "Profit", fmt: "rm", sign: true },
             { key: "profit_margin_pct", label: "Margin", fmt: "pct" }, { key: "invoice_count", label: "Invoices" },
         ]));
     }
@@ -760,7 +723,7 @@ function renderTables(findings) {
         ]));
     }
     if (findings.expense_ratio && findings.expense_ratio.top_expense_categories) {
-        tables.push(buildTable("Expense Categories (Sorted)", findings.expense_ratio.top_expense_categories, [
+        tables.push(buildTable("Expense Categories", findings.expense_ratio.top_expense_categories, [
             { key: "category", label: "Category" }, { key: "amount", label: "Amount", fmt: "rm" },
         ]));
     }
@@ -789,41 +752,42 @@ function buildTable(title, rows, cols) {
     return { title, html: `<table class="data-table"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>` };
 }
 
-/* ===== Recommendations ===== */
+/* ===== Recommended Actions ===== */
 function renderRecommendations(actions) {
-    const list = $("recommendationsList");
-    const badge = $("tabBadgeRecs");
-
+    const section = $("recSection");
+    const list = $("recList");
     if (!actions || actions.length === 0) {
-        badge.style.display = "none";
-        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No recommendations generated for this analysis.</p>';
+        section.style.display = "none";
         return;
     }
-
-    badge.style.display = "inline-flex";
-    badge.textContent = actions.length;
-
-    list.innerHTML = actions.map((a, i) => `
-        <div class="rec-item priority-${a.priority}" style="animation: panelIn 0.4s ease ${i * 0.08}s both;">
+    section.style.display = "block";
+    const colorMap = { 1: "var(--danger)", 2: "var(--warning)", 3: "var(--success)" };
+    const labelMap = { 1: "URGENT", 2: "IMPORTANT", 3: "GOOD TO DO" };
+    list.innerHTML = actions.map((a, i) => {
+        const color = colorMap[a.priority] || "var(--primary)";
+        const label = labelMap[a.priority] || "INFO";
+        const effort = a.priority === 1 ? "Low effort, high impact" : a.priority === 2 ? "Medium effort" : "Strategic";
+        return `<div class="rec-card priority-${a.priority}" style="animation: panelIn 0.4s ease ${i * 0.08}s both; border-left: 4px solid ${color};">
             <div class="rec-header">
-                <span class="rec-priority-badge">P${a.priority}</span>
-                <span class="rec-title">${esc(a.title)}</span>
+                <span class="rec-badge" style="background:${color};">P${a.priority} &middot; ${label}</span>
+                <span class="rec-effort">${effort}</span>
             </div>
-            <div class="rec-label">Finding</div>
-            <div class="rec-finding">${esc(a.finding)}</div>
-            <div class="rec-label">Recommendation</div>
-            <div class="rec-recommendation">${esc(a.recommendation)}</div>
-            <div class="rec-label">Why It Matters</div>
-            <div class="rec-rationale">${esc(a.rationale)}</div>
-        </div>
-    `).join("");
+            <div class="rec-title">${esc(a.title)}</div>
+            <div class="rec-body">
+                <div class="rec-field"><span class="rec-field-label">Problem:</span> ${esc(a.finding)}</div>
+                <div class="rec-field"><span class="rec-field-label">Action:</span> ${esc(a.recommendation)}</div>
+                <div class="rec-field"><span class="rec-field-label">Why:</span> ${esc(a.rationale)}</div>
+            </div>
+            <div class="rec-source">Source: ${esc(a.data_source)}</div>
+        </div>`;
+    }).join("");
 }
 
 /* ===== Data Notes ===== */
 function renderDataNotes(notes) {
     const list = $("dataNotesList");
     if (!notes || notes.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No notes or limitations for this analysis.</p>';
+        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No notes for this analysis.</p>';
         return;
     }
     list.innerHTML = notes.map((n, i) => `<li style="animation: panelIn 0.3s ease ${i * 0.05}s both;">${esc(n)}</li>`).join("");
@@ -837,7 +801,7 @@ function renderOutputFiles(result) {
     if (result.csv_downloads) result.csv_downloads.forEach((name) => files.push({ name, type: "csv", label: name.replace(/_/g, " ").replace(/\.csv$/i, "") }));
 
     if (files.length === 0) {
-        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No files generated for this analysis.</p>';
+        list.innerHTML = '<p style="color:var(--text-3);font-size:14px;padding:20px;">No files generated.</p>';
         return;
     }
 
@@ -914,3 +878,77 @@ function palette(n) {
     while (p.length < n) p.push(`hsla(${(p.length * 47) % 360}, 60%, 55%, 0.75)`);
     return p.slice(0, n);
 }
+
+/* ===== Reconciliation ===== */
+function renderReconciliation(recon) {
+    const s = recon.summary || {};
+    const issues = recon.issues || [];
+
+    const grid = $("kpiGrid");
+    if (grid && s.total_issues !== undefined) {
+        grid.innerHTML += kpiCard("Data Issues", s.total_issues,
+            `${s.critical_count || 0} critical, ${s.warning_count || 0} warnings`,
+            (s.critical_count || 0) > 0 ? "kpi-negative" : "kpi-positive");
+    }
+
+    const section = $("tablesSection");
+    if (section && issues.length > 0) {
+        const tableHtml = buildTable("Data Reconciliation Issues", issues, [
+            { key: "severity", label: "Severity", custom: (r) => {
+                const cl = r.severity === "critical" ? "kpi-negative" : r.severity === "warning" ? "kpi-neutral" : "kpi-positive";
+                return `<span class="${cl}" style="font-weight:700;text-transform:uppercase;font-size:11px;">${r.severity}</span>`;
+            }},
+            { key: "category", label: "Type" },
+            { key: "description", label: "Issue" },
+            { key: "action", label: "Action Needed" },
+        ]);
+        section.innerHTML += `<div class="table-card">${tableHtml.title}<div class="table-wrap">${tableHtml.html}</div></div>`;
+    }
+
+    if (s.total_issues === 0) {
+        const list = $("dataNotesList");
+        if (list) list.innerHTML = '<li style="animation: panelIn 0.3s ease both;"><strong style="color: var(--success);">All records reconcile correctly.</strong> No data integrity issues found.</li>' + list.innerHTML;
+    }
+}
+
+/* ===== Customer Messages ===== */
+function renderCustomerMessages(messages) {
+    if (!messages || messages.length === 0) return;
+
+    const section = $("tablesSection");
+    if (section) {
+        const tableHtml = buildTable("Customer Follow-Up Messages", messages, [
+            { key: "priority", label: "Pri", custom: (r) => `<span class="rec-priority-badge">P${r.priority}</span>` },
+            { key: "customer_name", label: "Customer" },
+            { key: "invoice_id", label: "Invoice" },
+            { key: "amount_owed", label: "Owed", fmt: "rm" },
+            { key: "status", label: "Status" },
+            { key: "channel", label: "Channel" },
+        ]);
+        section.innerHTML += `<div class="table-card"><h3>Customer Follow-Up Messages</h3><div class="table-wrap">${tableHtml.html}</div></div>`;
+    }
+
+    const list = $("dataNotesList");
+    if (list) {
+        let msgHtml = '<li style="animation: panelIn 0.3s ease both; list-style: none; margin-bottom: 16px;"><strong>Customer Messages (ready to copy-paste):</strong></li>';
+        messages.forEach((m, i) => {
+            msgHtml += `<li style="animation: panelIn 0.3s ease ${i * 0.05}s both; list-style: none; margin-bottom: 12px; padding: 12px; border-radius: 8px; background: var(--surface-2);">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                    <span class="rec-priority-badge">P${m.priority}</span>
+                    <strong>${esc(m.customer_name)}</strong>
+                    <span style="color:var(--text-3);">|</span>
+                    <span>${esc(m.invoice_id)}</span>
+                    <span style="color:var(--text-3);">|</span>
+                    <span class="kpi-negative" style="font-weight:700;">${fmtRM(m.amount_owed)}</span>
+                    <span style="color:var(--text-3);">|</span>
+                    <span style="font-size:11px;padding:2px 6px;border-radius:4px;background:var(--surface-3);">${esc(m.channel)}</span>
+                </div>
+                <pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.6;color:var(--text-2);margin:0;">${esc(m.message)}</pre>
+            </li>`;
+        });
+        list.innerHTML = msgHtml + list.innerHTML;
+    }
+}
+
+/* ===== Action Plan (REMOVED per user request) ===== */
+// renderActionPlan function removed — PLAN card no longer shows on Results page.

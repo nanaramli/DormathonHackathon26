@@ -1,0 +1,16 @@
+﻿Nombor Invois,Nama Pelanggan,Tarikh Dikeluarkan,Tarikh Akhir,Jumlah Bayaran,Jumlah Dibayar,Baki,Status,Kawasan,Produk
+INV001,Ahmad bin Salleh,2026-01-05,2026-01-15,450.00,450.00,0.00,berbayar,Lembah Pantai,Burger Special
+INV002,Siti Nurhaliza,2026-01-08,2026-01-18,320.00,200.00,120.00,tertunggak,Bangsar,Nasi Lemak Ayam
+INV003, Wong Chee Keong,2026-01-10,2026-01-20,180.00,0.00,180.00,menunggu,Kerinchi,Mee Goreng
+INV004,Nurul Aina,2026-01-12,2026-01-22,550.00,550.00,0.00,berbayar,Lembah Pantai,Packet Set Keluarga
+INV005,Raj Kumar,2026-01-15,2026-01-25,95.00,95.00,0.00,berbayar,Bangsar,Air Sirap
+INV006,Fatimah binti Yusof,2026-01-18,2026-01-28,275.00,100.00,175.00,tertunggak,Kerinchi,Kuih Muih Set
+INV007,Tan Mei Ling,2026-01-20,2026-01-30,400.00,400.00,0.00,berbayar,Lembah Pantai,Nasi Ayam Penyet
+INV008,Muhammad Haziq,2026-01-22,2026-02-01,210.00,0.00,210.00,menunggu,Bangsar,Rojak Buah
+INV009,Lim Wei Jie,2026-01-25,2026-02-04,680.00,680.00,0.00,berbayar,Kerinchi,Catering Hari Jadi
+INV010,Aishah binti Rosli,2026-01-28,2026-02-07,150.00,150.00,0.00,berbayar,Lembah Pantai,Sup Tulang
+INV011,Kumar Subramaniam,2026-02-01,2026-02-11,325.00,200.00,125.00,tertunggak,Bangsar,Briyani Gam
+INV012,Nurul Huda,2026-02-05,2026-02-15,430.00,430.00,0.00,berbayar,Kerinchi,Laksa Sarawak
+INV013,Goh Chuan Ee,2026-02-08,2026-02-18,220.00,0.00,220.00,menunggu,Lembah Pantai,Cendol Ais Kacang
+INV14,Farah Dhiya,2026-02-10,2026-02-20,380.00,380.00,0.00,berbayar,Bangsar,Asam Pedas Ikan
+INV015, Hakimi bin Roslan,2026-02-12,2026-02-22,165.00,80.00,85.00,tertunggak,Kerinchi,Teh Tarik Set

@@ -4,7 +4,6 @@ web_app.py - Flask web application for RichBuddy.
 Wraps the existing Phase 1 + Phase 2 analysis modules into an interactive
 web dashboard.  Users can:
   - Upload CSV/Excel business data files
-  - Use built-in sample data
   - Run any of the 5 analysis types via buttons or free-text instruction
   - View results with charts and tables
   - Download generated reports and CSV files
@@ -52,25 +51,6 @@ def index():
 def api_intents():
     """Return the list of supported analysis intents."""
     return jsonify({"intents": get_supported_intents()})
-
-
-@app.route("/api/sample", methods=["POST"])
-def api_load_sample():
-    """Load the built-in sample dataset."""
-    if not os.path.isdir(SAMPLE_DATA_DIR):
-        return jsonify({"error": f"Sample data directory not found: {SAMPLE_DATA_DIR}"}), 404
-    try:
-        dataset = load_dataset(SAMPLE_DATA_DIR)
-    except DataLoadError as e:
-        return jsonify({"error": str(e)}), 400
-
-    summary = describe_dataset(dataset)
-    return jsonify({
-        "success": True,
-        "summary": _json_safe(summary),
-        "invoice_count": len(dataset["invoices"]),
-        "transaction_count": len(dataset["transactions"]),
-    })
 
 
 @app.route("/api/upload", methods=["POST"])
@@ -151,9 +131,8 @@ def api_analyze():
     uses sample data.
     """
     # ------------------------------------------------------------------
-    # Determine data source: re-uploaded files or sample data
+    # Determine data source: uploaded files only (sample data removed)
     # ------------------------------------------------------------------
-    use_sample = request.form.get("use_sample", "false").lower() == "true"
     instruction = request.form.get("instruction", "").strip()
     files = request.files.getlist("files")
 
@@ -161,18 +140,11 @@ def api_analyze():
     if not instruction:
         return jsonify({"error": "No instruction provided"}), 400
 
-    # Load dataset
+    # Load dataset from uploaded files
     dataset = None
     adaptation_notes: list[str] = []
 
-    if use_sample:
-        if not os.path.isdir(SAMPLE_DATA_DIR):
-            return jsonify({"error": "Sample data not available"}), 404
-        try:
-            dataset = load_dataset(SAMPLE_DATA_DIR)
-        except DataLoadError as e:
-            return jsonify({"error": str(e)}), 400
-    elif files and any(f.filename for f in files):
+    if files and any(f.filename for f in files):
         saved_paths: list[str] = []
         session_dir = tempfile.mkdtemp(dir=UPLOAD_DIR)
         for f in files:
@@ -189,7 +161,7 @@ def api_analyze():
             return jsonify({"error": str(e)}), 400
         shutil.rmtree(session_dir, ignore_errors=True)
     else:
-        return jsonify({"error": "No data source. Either upload files or use sample data."}), 400
+        return jsonify({"error": "No data source. Please upload files."}), 400
 
     # ------------------------------------------------------------------
     # Run the analysis pipeline
